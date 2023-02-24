@@ -15,8 +15,8 @@ embedding space using a simplified version of the ROCO dataset.
 A complete task description can be viewed [here](Hackathon%20Task%20Description.pdf).
 
 CLIP documentation:
-- See this blog post: https://openainode src/server.js.com/blog/clip/
-- And this paper: https://arxiv.org/pdf/2103.00020.pd
+- See this blog post: https://openai.com/blog/clip/
+- And this paper: https://arxiv.org/pdf/2103.00020.pdf
 
 ## Group members
 
