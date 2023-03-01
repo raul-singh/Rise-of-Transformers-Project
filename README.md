@@ -20,5 +20,5 @@ CLIP documentation:
 
 ## Group members
 
-- [Raul Singh](https://github.com/RaulSingh-7)
+- [Raul Singh](https://github.com/raul-singh)
 - [Davide Rigamonti](https://github.com/daviderigamonti)
