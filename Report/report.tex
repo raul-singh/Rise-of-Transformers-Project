@@ -1,0 +1,91 @@
+\documentclass[12pt, a4paper]{article}
+
+%%
+% PREAMBLE
+%%
+
+\usepackage{geometry}   % Edit document margins
+\usepackage{hyperref}   % Table of contents hyperlinks
+\usepackage{parskip}    % Paragraph indent & skip
+\usepackage{graphicx}   % 'graphics' package interface
+\usepackage{colortbl}	% Colored tables
+\usepackage{listings}   % Code sections formatting
+\usepackage{xcolor}     % More colors
+\usepackage{amsmath}    % Math
+\usepackage{amsfonts}   % Math fonts
+\usepackage{blindtext}  % Placeholder Text
+
+% Margins
+\geometry{top=1cm,left=2cm,right=2cm,bottom=2cm}
+
+% Custom Colors
+\definecolor{AnnotationGreen}{RGB}{34, 128, 45}
+\definecolor{CommentGreen}{RGB}{29, 204, 49}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks,
+    citecolor = blue,
+    filecolor = blue,
+    linkcolor = blue,
+    urlcolor = blue
+}
+
+% Python code formatting
+% Use it by creating an environment like \begin{lstlisting}[style=Python] ... \end{lstlisting}
+% Since annotations aren't tagged as keywords I have inserted a manual delimiter for them,
+% it works as follows: \@@AnnotationText@@/
+\lstdefinestyle{Python}{
+    language = Python,
+    basicstyle = \footnotesize\ttfamily,
+    commentstyle = \textcolor{CommentGreen},
+    stringstyle = \textcolor{orange},
+    showstringspaces = false,
+    keywordstyle = \textcolor{blue},
+    moredelim = [is][\textcolor{AnnotationGreen}]{\\@}{@@\/},   % Annotations
+    numberstyle = \scriptsize\ttfamily\textcolor{gray},
+    numbers = left,
+    frame = single,
+    frameround = tttt,
+    framexleftmargin = 20pt,
+    framexrightmargin = 20pt
+}
+
+%Titling
+\title{\huge\bfseries CLIP Hackathon Task \\ \normalsize\bfseries Advanced Topics in Deep Learning: The Rise of Transformers}
+\date{September 2023}
+\author{\textit{Raul Singh} \and \textit{Davide Rigamonti}}
+
+%%
+% DOCUMENT
+%%
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+\blindtext[1]
+\subsection{Goals}
+\blindtext[1]
+\subsection{CLIP Principles}
+\blindtext[1]
+\subsection{Dataset Analysis}
+\blindtext[1]
+
+\section{Hackathon Results}
+\blindtext[1]
+\subsection{Initial Intuition}
+\blindtext[1]
+\subsection{Idea Refining}
+\blindtext[1]
+
+\section{Post-Hackathon Improvements}
+\blindtext[1]
+
+\section{Conclusions}
+\blindtext[1]
+
+\end{document}
