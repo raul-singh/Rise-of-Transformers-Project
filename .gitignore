@@ -54,7 +54,7 @@ coverage.xml
 .vscode
 
 # Model weights
-Code/Models/Weights
+Code/Models/Weights/*.h5
 
 ### LaTeX ###
 
