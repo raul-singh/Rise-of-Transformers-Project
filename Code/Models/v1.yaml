@@ -1,0 +1,14 @@
+download:
+  text_preprocess: https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3
+  text_transformer: https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-4_H-512_A-8/1
+  img_preprocess: convnext
+  img_supernet: ConvNeXtTiny
+
+model:
+  img_input_shape:
+    - 128
+    - 128
+    - 3
+  embed_dim: 64
+  learning_rate: 0.00002
+  weights_path: ../Models/Weights/v1_weights.h5

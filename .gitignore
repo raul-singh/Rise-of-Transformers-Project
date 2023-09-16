@@ -53,6 +53,9 @@ coverage.xml
 # VSCode
 .vscode
 
+# Model weights
+Code/Models/Weights
+
 ### LaTeX ###
 
 ### PDFs in report directory
