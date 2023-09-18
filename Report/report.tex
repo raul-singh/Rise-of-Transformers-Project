@@ -14,7 +14,8 @@
 \usepackage{amsmath}    % Math
 \usepackage{amsfonts}   % Math fonts
 \usepackage{amssymb}    % Math symbols
-\usepackage{blindtext}  % Placeholder Text
+\usepackage{blindtext}  % Placeholder text
+\usepackage{setspace}   % Iterline spacing
 
 % Margins
 \geometry{top=1cm,left=2cm,right=2cm,bottom=2cm}
@@ -110,8 +111,8 @@ We created 2 preliminary notebooks that tackled the defined tasks, these noteboo
 \subsubsection{Data Gathering}
 Since the given dataset was problematic to handle due to its dimension and its uncommon compression encoding, part of our efforts were dedicated to create a proper \textit{data pipeline} to feed the model.
 
-The preliminary data gathering pipeline loads separately captions and images, performing different preprocessing for both of them (using the \textit{transformer custom standardization function} seen during lectures for text, while performing \textit{resizing} and \textit{normalization} for image pixel data).
-The captions are then vectorized using a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/TextVectorization}{Keras text vectorization layer}, all the elements are split manually into train, test and validation sets (the vectorization and split process causes data leakage, it will be corrected later) and stored into Python lists.
+The preliminary data gathering pipeline loads captions and images separately, performing different preprocessing for both of them (using the \textit{transformer custom standardization function} seen during lectures for textual data, while performing \textit{resizing} and \textit{normalization} for image pixel data).
+The captions are then vectorized using a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/TextVectorization}{Keras text vectorization layer}, all the elements are split manually into train, test and validation sets and stored into Python lists.
 
 Various visualizations of the imported images and data were added to ensure the correctness of the loading process.
 
@@ -126,28 +127,65 @@ All of the hidden layers have \href{https://www.tensorflow.org/api_docs/python/t
 For the text encoding we used a \textit{transformer encoder block} that was presented during the course lectures, which makes use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/MultiHeadAttention}{multi-head attention}, \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/LayerNormalization}{layer normalization} and \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dropout}{dropout} layers; at the end of the block there are 2 \textit{dense layers} to obtain a final embedding of size 128.
 Before being fed to the encoder block, inputs pass through a double \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Embedding}{embedding layer} that implements \textit{positional embedding} by addition.
 
-The complete model routes the two inputs (image and text) to their respective encoders, normalizes the resulting embeddings and obtains the \textit{logits} by applying the formula outlined in the OpenAI paper ($logits = (I_e \cdot T_e^{\top})e^t$), calculates the individual losses by means of \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/CategoricalCrossentropy}{categorical cross-entropy} and averages them.
+The complete model routes the two inputs (image and text) to their respective encoders, normalizes the resulting embeddings and obtains the \textit{logits} by applying the formula outlined in the OpenAI paper: $logits = (I_e \cdot T_e^{\top})e^t$.
+Then, the individual losses are calculated by means of \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/CategoricalCrossentropy}{categorical cross-entropy} and are averaged to obtain the final loss.
 
 \subsection{Idea Refining}
 As mentioned before, the very last notebook obtained at the end of the hackathon didn't work correctly as there were some small discrepancies between the sizes of the expected inputs vs.\ the actual inputs, and we were trying to apply \textit{categorical cross-entropy} utilizing numeric variables that were not \textit{one-hot encoded}.
 
-The following days we dedicated some of our time to slightly refine the hackathon product in order to have a functioning model.
+The day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
 By adapting the structure of our network to the input data, fixing minor conflicts related to typing and employing \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/SparseCategoricalCrossentropy}{sparse categorical cross-entropy} instead of \textit{categorical cross-entropy}, we managed to obtain a working CLIP implementation.
 
 Due to the inefficient loading technique we weren't able to hold the entirety of the dataset and the model in memory, thus we couldn't test it properly.
 However, by considering a fraction of the dataset and training the model on it for around 10 epochs, we noticed that the results were quite scarce as the loss would not get any lower after the first few epochs.
 When considering a top-k image-retrieval task on the training dataset with an exact caption as a query, the target image was only occasionally present in the top-10 matched results, and never in the top-5.
 
-{
-\tiny
-The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
-This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
-}
+\begin{spacing}{1.25}
+    \tiny
+    The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
+    This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
+\end{spacing}
 
 \section{Post-Hackathon Improvements}
+This section is dedicated to exploring all the improvements (successful and non) that were performed in the months following the initial hackathon challenge.
+Some of these improvements are strictly related to the model structure and performance, while others are centered around \textit{data exploration}, \textit{data gathering} and \textit{model evaluation}.
+
+\subsection{Loss Function}
+We decided to reimplement the loss function from scratch and how it is integrated inside the CLIP model as we previously made use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{TensorFlow lambda layers} to perform mathematical operations, and we noticed that they were causing problems in the gradient calculation process and during import/export operations.
+
+The approach we took for the new loss was quite radical as we decided to delve into the \href{https://www.tensorflow.org/api_docs/python/tf/keras/Model}{Keras model} by \textit{overriding} the \texttt{train\char`_step} and \texttt{text\char`_step} in order to have more control on how the model calculates loss and its backpropagation process.
+Although we modified the overall structure of the model, the mathematical essence of the loss function remains the same as the one defined in the reference OpenAI paper.
+
+\subsection{Lazy Loading}
+It was previously mentioned that the size of the complete dataset was a critical factor that needed to be taken into account at some point.
+
+By implementing a \textit{lazy loading} interface utilizing the \href{https://www.tensorflow.org/api_docs/python/tf/data/Dataset}{TensorFlow dataset class} and exploiting the \textit{map/reduce paradigm} with \textit{lambda functions} we were able to load the actual pixel data of images from their image path only when needed.
+We wrapped this operation inside a custom function called \texttt{create\char`_dataset} that exposes a general interface which allows for parametrization of the dataset creation procedure through parameters that influence \textit{batching}, \textit{shuffling}, \textit{dataset structure}, \textit{caching} and other aspects.
+
+At this point we noticed that the vectorization for the captions was causing a minor \textit{data leakage} from the test set to the train set, we corrected the mistake and implemented a new splitting function by wrapping the \href{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html}{scikit-learn train\_test\_split function} inside a custom function to also manage validation splits.
+
+\subsection{Image Embedding}
 \blindtext[1]
 
-\section{Conclusions}
+\subsection{Text Embedding}
+\blindtext[1]
+
+\subsection{Evaluation}
+In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric, which is not really optimal for various reasons, therefore we decided to write a separate notebook solely dedicated to model evaluation for the two main retrieval tasks.
+
+The inference procedure is specular for image and text retrieval: we first generate the embeddings of the feature that we want to retrieve by calling the \texttt{predict} method of the relevant encoder on the dataset that we want to utilize.
+Then, for every query of the dataset we generate the embedding through the other encoder, and we compute the \textit{cosine similarity} to then retrieve the \textit{top-k} results for each query.
+
+Finally, we compute the mean \textbf{accuracy}, \textbf{precision}, \textbf{recall} and \textbf{F1} for the query dataset through \textit{micro-averaging}, and we visualize them utilizing \textit{graphs} and \textit{reports} with the possibility of comparing evaluations between models or against a random classifier baseline.
+However, we noticed there are multiple \textbf{relevance metrics} that are interesting to take into consideration (explained taking into consideration image retrieval):
+\begin{itemize}
+    \item \textbf{Caption Equality}: a result is relevant only if its caption is equal to the original query; it can be quite restrictive since there are at most a few images per caption and most of the captions are unique.
+    \item \textbf{Concept Overlap}: a result is relevant only if it shares \textit{n} concepts with the original element; it provides a good estimate for real use-cases but can be misleading if the threshold is too low, in addition it cannot be used if the concept data is not present.
+\end{itemize}
+
+\section{Other Tasks}
+
+\section{Results}
 \blindtext[1]
 
 \end{document}
