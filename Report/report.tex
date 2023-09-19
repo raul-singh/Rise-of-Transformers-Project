@@ -151,9 +151,10 @@ This section is dedicated to exploring all the improvements (successful and non)
 Some of these improvements are strictly related to the model structure and performance, while others are centered around \textit{data exploration}, \textit{data gathering} and \textit{model evaluation}.
 
 \subsection{Loss Function}
-We decided to reimplement the loss function from scratch and how it is integrated inside the CLIP model as we previously made use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{TensorFlow lambda layers} to perform mathematical operations, and we noticed that they were causing problems in the gradient calculation process and during import/export operations.
+We decided to reimplement the loss function and how it is integrated inside the CLIP model from scratch as we previously made use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{TensorFlow lambda layers} to perform mathematical operations.
+We noticed that these layers were causing problems in both the gradient calculation process and during import/export operations.
 
-The approach we took for the new loss was quite radical as we decided to delve into the \href{https://www.tensorflow.org/api_docs/python/tf/keras/Model}{Keras model} by \textit{overriding} the \texttt{train\char`_step} and \texttt{text\char`_step} in order to have more control on how the model calculates loss and its backpropagation process.
+The approach we took for the new loss was quite radical as we decided to delve into the \href{https://www.tensorflow.org/api_docs/python/tf/keras/Model}{Keras model} by \textit{overriding} the \texttt{train\char`_step} and \texttt{text\char`_step} in order to have more control on how the model calculates loss and how it performs its backpropagation process.
 Although we modified the overall structure of the model, the mathematical essence of the loss function remains the same as the one defined in the reference OpenAI paper.
 
 \subsection{Lazy Loading}
@@ -176,10 +177,10 @@ In the first steps of this project we were using the \textit{loss} returned by t
 The inference procedure is specular for image and text retrieval: we first generate the embeddings of the feature that we want to retrieve by calling the \texttt{predict} method of the relevant encoder on the dataset that we want to utilize.
 Then, for every query of the dataset we generate the embedding through the other encoder, and we compute the \textit{cosine similarity} to then retrieve the \textit{top-k} results for each query.
 
-Finally, we compute the mean \textbf{accuracy}, \textbf{precision}, \textbf{recall} and \textbf{F1} for the query dataset through \textit{micro-averaging}, and we visualize them utilizing \textit{graphs} and \textit{reports} with the possibility of comparing evaluations between models or against a random classifier baseline.
+Finally, we compute the mean \textbf{accuracy}, \textbf{precision}, \textbf{recall} and \textbf{F1 score} for the query dataset through \textit{micro-averaging}, and we visualize them utilizing \textit{graphs} and \textit{reports} with the possibility of comparing evaluations between models or against a random classifier baseline.
 However, we noticed there are multiple \textbf{relevance metrics} that are interesting to take into consideration (explained taking into consideration image retrieval):
 \begin{itemize}
-    \item \textbf{Caption Equality}: a result is relevant only if its caption is equal to the original query; it can be quite restrictive since there are at most a few images per caption and most of the captions are unique.
+    \item \textbf{Caption Equality}: a result is relevant only if its caption is equal to the original query; it can be quite restrictive since most of the captions are unique.
     \item \textbf{Concept Overlap}: a result is relevant only if it shares \textit{n} concepts with the original element; it provides a good estimate for real use-cases but can be misleading if the threshold is too low, in addition it cannot be used if the concept data is not present.
 \end{itemize}
 
