@@ -16,9 +16,7 @@
 \usepackage{amssymb}    % Math symbols
 \usepackage{blindtext}  % Placeholder text
 \usepackage{setspace}   % Iterline spacing
-
-% Margins
-\geometry{top=1cm,left=2cm,right=2cm,bottom=2cm}
+\usepackage{multicol}   % Multicolumns
 
 % Custom Colors
 \definecolor{AnnotationGreen}{RGB}{34, 128, 45}
@@ -54,8 +52,8 @@
 }
 
 %Titling
-\title{\huge\bfseries CLIP Hackathon Task \\ \normalsize\bfseries Advanced Topics in Deep Learning: The Rise of Transformers}
-\date{September 2023}
+\title{}
+\date{}
 \author{\textit{Raul Singh} \and \textit{Davide Rigamonti}}
 
 %%
@@ -64,10 +62,24 @@
 
 \begin{document}
 
-\maketitle
+% Title
+\include{title}
+\newpage
 
-\tableofcontents
+% ToC
+{
+    \hypersetup{hidelinks}
+    \tableofcontents
+}
 
+\pagenumbering{gobble}
+\newpage
+\pagenumbering{arabic}
+
+% Margins
+\newgeometry{top=1cm,left=1.5cm,right=1.5cm,bottom=2cm}
+
+% Introduction
 \section{Introduction}
 This is a project that has been developed in the context of the \textit{Advanced Topics in Deep Learning: The Rise of Transformers} course held at \textit{Politecnico di Milano} and supervised by Professor Matteo Matteucci.
 The initial assignment was carried out as a one-day hackathon held at Politecnico on the 1st of February 2023.
@@ -98,6 +110,7 @@ The dataset provided is a \textit{simplified} version of the \href{https://link.
 
 %TODO: dataset analysis
 
+% Hackathon Results
 \section{Hackathon Results}
 The self-imposed goal for the hackathon was to build a CLIP model capable of performing image retrieval, thus we initially left out the portion of data regarding concepts and labels.
 
@@ -146,6 +159,7 @@ When considering a top-k image-retrieval task on the training dataset with an ex
     This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
 \end{spacing}
 
+% Post-Hackathon Improvements
 \section{Post-Hackathon Improvements}
 This section is dedicated to exploring all the improvements (successful and non) that were performed in the months following the initial hackathon challenge.
 Some of these improvements are strictly related to the model structure and performance, while others are centered around \textit{data exploration}, \textit{data gathering} and \textit{model evaluation}.
