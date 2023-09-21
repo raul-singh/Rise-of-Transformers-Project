@@ -129,7 +129,7 @@ def text_encoder(embed_dim, preprocess, transformer, trainable=True):
     return text_encoder
 
 
-def build_clip(settings_path, load_weights=True):
+def build_clip(settings_path, weights_path=None, load_weights=True):
 
     with open(settings_path, "r") as stream:
         try:
@@ -154,8 +154,11 @@ def build_clip(settings_path, load_weights=True):
     img_supernet.trainable = False
 
     if load_weights:
+        
         print('Loading parameters...')
-        clip.load_weights(model_settings['weights_path'])
+
+        weights = model_settings['weights_path'] if weights_path is None else weights_path
+        clip.load_weights(weights)
 
     print('Done.')
 
