@@ -129,7 +129,7 @@ def text_encoder(embed_dim, preprocess, transformer, trainable=True):
     return text_encoder
 
 
-def build_clip(settings_path):
+def build_clip(settings_path, load_weights=True):
 
     with open(settings_path, "r") as stream:
         try:
@@ -148,13 +148,14 @@ def build_clip(settings_path):
     clip_image_encoder = image_encoder(image_shape, model_settings['embed_dim'], img_supernet, img_preprocess)
 
     clip = CLIP(clip_image_encoder, clip_text_encoder)
-    clip.compile(optimizer = tf.optimizers.AdamW(learning_rate=model_settings['learning_rate']))
+    clip.compile(optimizer = tf.optimizers.AdamW(learning_rate=model_settings['learning_rate'], weight_decay=model_settings['weight_decay']))
 
     text_transformer.trainable = False
     img_supernet.trainable = False
 
-    print('Loading parameters...')
-    clip.load_weights(model_settings['weights_path'])
+    if load_weights:
+        print('Loading parameters...')
+        clip.load_weights(model_settings['weights_path'])
 
     print('Done.')
 

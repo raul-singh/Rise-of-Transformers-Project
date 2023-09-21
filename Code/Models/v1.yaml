@@ -11,4 +11,5 @@ model:
     - 3
   embed_dim: 64
   learning_rate: 0.00002
+  weight_decay: 0.04
   weights_path: ../Models/Weights/v1.h5
