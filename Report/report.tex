@@ -17,6 +17,11 @@
 \usepackage{blindtext}  % Placeholder text
 \usepackage{setspace}   % Iterline spacing
 \usepackage{multicol}   % Multicolumns
+\usepackage{wrapfig}    % Figure wrapping
+\usepackage{caption}    % Captions
+
+% Image caption setup
+\captionsetup{labelformat=empty}
 
 % Custom Colors
 \definecolor{AnnotationGreen}{RGB}{34, 128, 45}
@@ -50,11 +55,6 @@
     framexleftmargin = 20pt,
     framexrightmargin = 20pt
 }
-
-%Titling
-\title{}
-\date{}
-\author{\textit{Raul Singh} \and \textit{Davide Rigamonti}}
 
 %%
 % DOCUMENT
@@ -100,15 +100,36 @@ In short, \textbf{CLIP} stands for \textbf{C}ontrastive \textbf{L}anguage-\textb
 This peculiar pre-training technique enables the model to achieve relevant performance metrics on a wide array of zero-shot tasks (such as classification) while using a fraction of the dataset of other popular deep learning models performing the same task.
 
 \subsection{Dataset Analysis}
-% TODO: number of images 
-The dataset provided is a \textit{simplified} version of the \href{https://link.springer.com/chapter/10.1007/978-3-030-01364-6_20}{\textbf{ROCO} dataset} (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) which consists of xxxxx elements composed of:
+
+The dataset provided is a \textit{simplified} version of the \href{https://link.springer.com/chapter/10.1007/978-3-030-01364-6_20}{\textbf{ROCO} dataset} (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) which consists of \textit{83275} elements composed of:
+
 \begin{itemize}
     \item A low resolution image that has been reduced in size.
     \item A corresponding textual caption that describes the image.
     \item A set of concept labels that characterizes the attributes of the image.
 \end{itemize}
 
-%TODO: dataset analysis
+There are \textit{80813} unique captions as most of them are present in the database only one time, the most common caption appears in \textit{261} images.
+
+Images can have from \textit{1} to \textit{50} concepts associated to them from a total of \textit{8374} concepts, averaging around \textit{5} concepts per image.
+
+Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept.
+
+
+\begin{figure}
+        \hspace*{-4.5em}
+        \begin{minipage}{25em}
+            \centering
+            \includegraphics[width=22em]{img/Data_Exploration_2.png}
+            \caption{Concepts per Image}
+        \end{minipage}
+        \begin{minipage}{25em}
+            \centering
+            \includegraphics[width=25em]{img/Data_Exploration_3.png}
+            \caption{Images per Concept}
+        \end{minipage}
+\end{figure}
+
 
 % Hackathon Results
 \section{Hackathon Results}
@@ -153,11 +174,8 @@ Due to the inefficient loading technique we weren't able to hold the entirety of
 However, by considering a fraction of the dataset and training the model on it for around 10 epochs, we noticed that the results were quite scarce as the loss would not get any lower after the first few epochs.
 When considering a top-k image-retrieval task on the training dataset with an exact caption as a query, the target image was only occasionally present in the top-10 matched results, and never in the top-5.
 
-\begin{spacing}{1.25}
-    \tiny
-    The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
-    This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
-\end{spacing}
+The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
+This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
 
 % Post-Hackathon Improvements
 \section{Post-Hackathon Improvements}
