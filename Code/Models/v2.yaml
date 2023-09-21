@@ -1,0 +1,20 @@
+# Smaller bert and embed dim, larger weight decay, slight improvement
+# Loss: 0.69
+# CAPTION EQUALITY @ k=10 -> Acc: 10.903%, MAP: 1.1647%, MAR: 10.2305%, F1: 2.0914%
+# CONCEPT OVERLAP @ k=10: -> Acc: 60.7829%, MAP: 24.5677%, MAR: 2.4367%, F1: 4.4337%
+
+download:
+  text_preprocess: https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3
+  text_transformer: https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-2_H-512_A-8/2
+  img_preprocess: convnext
+  img_supernet: ConvNeXtTiny
+
+model:
+  img_input_shape:
+    - 128
+    - 128
+    - 3
+  embed_dim: 32
+  learning_rate: 0.00002
+  weight_decay: 0.1
+  weights_path: ../Models/Weights/v2.h5
