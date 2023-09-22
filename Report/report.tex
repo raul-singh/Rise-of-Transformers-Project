@@ -209,11 +209,16 @@ As previously explained, our implementation of the model was completely from scr
 
 As shown during the course lectures, we decided to try to leverage a \textit{pre-trained} model for both our image and text encoder and perform \textit{transfer learning}.
 
-\subsubsection{Image Encorder}
-For the image encoder, we chose to utilize a \href{https://github.com/facebookresearch/ConvNeXt}{ConvNeXt} network via the \href{https://keras.io/api/applications/}{Keras Applications API}, specifically the \href{https://keras.io/api/applications/convnext/#convnexttiny-function}{ConvNeXtTiny} variant, known for its compact size yet commendable performance. We made this selection based on two primary reasons: firstly, to opt for a reasonably sized and efficient CNN to mitigate the risk of overfitting, and secondly, due to our past projects demonstrating impressive results with this network, making it a logical starting point.
+\subsubsection{Image Encoder}
+For the image encoder, we chose to utilize a \href{https://github.com/facebookresearch/ConvNeXt}{ConvNeXt} network via the \href{https://keras.io/api/applications/}{Keras Applications API}, specifically the \href{https://keras.io/api/applications/convnext/#convnexttiny-function}{ConvNeXtTiny} variant, known for its compact size yet commendable performance.
+We made this selection based on two primary reasons: firstly, to opt for a reasonably sized and efficient CNN to mitigate the risk of overfitting, and secondly, due to our past projects demonstrating impressive results with this network, making it a logical starting point.
 
-\subsubsection{Text Encorder}
-As for the text encoder, we employed \href{https://huggingface.co/docs/transformers/model_doc/bert}{BERT} as our preferred \textit{text transformer}. We initially utilized the base version of the transformer as a foundation. Importing and integrating the model as a layer within our architecture posed a challenge, given that most methods are designed for standalone use of these models. In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and seamlessly incorporating it into our model.
+\subsubsection{Text Encoder}
+As for the text encoder, we employed \href{https://huggingface.co/docs/transformers/model_doc/bert}{BERT} as our preferred \textit{text transformer}.
+We initially utilized the base version of the transformer as a foundation.
+
+Importing and integrating the model as a layer within our architecture posed a challenge, given that most methods are designed for standalone use of these models.
+In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and seamlessly incorporating it into our model.
 
 \subsection{Embedding Projection}
 As previously explained, our architecture comprises the following components:
@@ -221,7 +226,8 @@ As previously explained, our architecture comprises the following components:
     \item an \textit{image encoder} followed by a 2-layer dense neural network
     \item a \textit{text encoder} followed by a 2-layer dense neural network
 \end{itemize}
-The purpose of the 2-layer dense network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space. In an effort to enhance this projection, we engaged in thorough experimentation.
+The purpose of the 2-layer dense network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
+In an effort to enhance this projection, we engaged in thorough experimentation.
 After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, culminating in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
 
 We also explored various activation functions, starting with \href{https://keras.io/api/layers/activation_layers/relu/}{ReLU} and subsequently testing \href{https://www.tensorflow.org/api_docs/python/tf/keras/activations/gelu}{GELU}, \href{https://www.tensorflow.org/api_docs/python/tf/nn/silu}{SiLU}, and \href{https://www.tensorflow.org/api_docs/python/tf/nn/selu}{SELU}. Ultimately, SELU demonstrated a significant improvement, prompting us to adopt it for the projection.
@@ -248,7 +254,6 @@ Both dense layers were configured with 128 neurons, resulting in a 128-dimension
         \draw [arrow] (add) -- (norm);
         \draw [arrow] (dense1) to[bend left] (add);
         \draw [arrow] (norm) -- (output);
-
     \end{tikzpicture}
 \end{center}    
 
