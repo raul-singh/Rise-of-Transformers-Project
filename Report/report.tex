@@ -19,6 +19,13 @@
 \usepackage{multicol}   % Multicolumns
 \usepackage{wrapfig}    % Figure wrapping
 \usepackage{caption}    % Captions
+\usepackage{tikz}       % Charts
+\usepackage{makecell}   % Helper for flowcharts
+
+% Tikz imports and setup for flowcharts
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=1.7cm, minimum height=0.5cm,text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 % Image caption setup
 \captionsetup{labelformat=empty}
@@ -77,7 +84,7 @@
 \pagenumbering{arabic}
 
 % Margins
-\newgeometry{top=1cm,left=1.5cm,right=1.5cm,bottom=2cm}
+\newgeometry{top=0.5cm,left=1.5cm,right=1.5cm,bottom=2cm}
 
 % Introduction
 \section{Introduction}
@@ -196,6 +203,54 @@ By implementing a \textit{lazy loading} interface utilizing the \href{https://ww
 We wrapped this operation inside a custom function called \texttt{create\char`_dataset} that exposes a general interface which allows for parametrization of the dataset creation procedure through parameters that influence \textit{batching}, \textit{shuffling}, \textit{dataset structure}, \textit{caching} and other aspects.
 
 At this point we noticed that the vectorization for the captions was causing a minor \textit{data leakage} from the test set to the train set, we corrected the mistake and implemented a new splitting function by wrapping the \href{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html}{scikit-learn train\_test\_split function} inside a custom function to also manage validation splits.
+
+\subsection{Pre-Trained Models}
+As previously explained, our implementation of the model was completely from scratch. At this point we we encountered a performance bottleneck, impeding any further enhancement of the model. This was probably due to the huge amount of parameters in the model, which were quite a challenging task to train from scratch, even considering our large dataset.
+
+As shown during the course lectures, we decided to try to leverage a \textit{pre-trained} model for both our image and text encoder and perform \textit{transfer learning}.
+
+\subsubsection{Image Encorder}
+For the image encoder, we chose to utilize a \href{https://github.com/facebookresearch/ConvNeXt}{ConvNeXt} network via the \href{https://keras.io/api/applications/}{Keras Applications API}, specifically the \href{https://keras.io/api/applications/convnext/#convnexttiny-function}{ConvNeXtTiny} variant, known for its compact size yet commendable performance. We made this selection based on two primary reasons: firstly, to opt for a reasonably sized and efficient CNN to mitigate the risk of overfitting, and secondly, due to our past projects demonstrating impressive results with this network, making it a logical starting point.
+
+\subsubsection{Text Encorder}
+As for the text encoder, we employed \href{https://huggingface.co/docs/transformers/model_doc/bert}{BERT} as our preferred \textit{text transformer}. We initially utilized the base version of the transformer as a foundation. Importing and integrating the model as a layer within our architecture posed a challenge, given that most methods are designed for standalone use of these models. In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and seamlessly incorporating it into our model.
+
+\subsection{Embedding Projection}
+As previously explained, our architecture comprises the following components:
+\begin{itemize}
+    \item an \textit{image encoder} followed by a 2-layer dense neural network
+    \item a \textit{text encoder} followed by a 2-layer dense neural network
+\end{itemize}
+The purpose of the 2-layer dense network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space. In an effort to enhance this projection, we engaged in thorough experimentation.
+After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, culminating in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
+
+We also explored various activation functions, starting with \href{https://keras.io/api/layers/activation_layers/relu/}{ReLU} and subsequently testing \href{https://www.tensorflow.org/api_docs/python/tf/keras/activations/gelu}{GELU}, \href{https://www.tensorflow.org/api_docs/python/tf/nn/silu}{SiLU}, and \href{https://www.tensorflow.org/api_docs/python/tf/nn/selu}{SELU}. Ultimately, SELU demonstrated a significant improvement, prompting us to adopt it for the projection.
+
+Both dense layers were configured with 128 neurons, resulting in a 128-dimensional embedding space.
+
+\begin{center}
+    \begin{tikzpicture}[node distance=2cm]
+        \node (dense1) [block] {\makecell[l]{Dense \\ Layer}};
+        \node (selu) [block, right of=dense1, xshift=0.5cm] {SELU};
+        \node (dense2) [block, right of=selu, xshift=0.5cm] {\makecell[l]{Dense \\ Layer}};
+        \node (dropout) [block, right of=dense2, xshift=0.5cm] {Dropout};
+        \node (add) [block, right of=dropout, xshift=0.5cm] {Add};
+        \node (norm) [block, right of=add, xshift=0.5cm] {\makecell[l]{Layer \\ Norm}};
+
+        \node (input) [left of=dense1] {};
+        \node (output) [right of=norm] {};
+
+        \draw [arrow] (input) -- (dense1);
+        \draw [arrow] (dense1) -- (selu);
+        \draw [arrow] (selu) -- (dense2);
+        \draw [arrow] (dense2) -- (dropout);
+        \draw [arrow] (dropout) -- (add);
+        \draw [arrow] (add) -- (norm);
+        \draw [arrow] (dense1) to[bend left] (add);
+        \draw [arrow] (norm) -- (output);
+
+    \end{tikzpicture}
+\end{center}    
 
 \subsection{Image Embedding}
 \blindtext[1]
