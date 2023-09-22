@@ -205,7 +205,7 @@ We wrapped this operation inside a custom function called \texttt{create\char`_d
 At this point we noticed that the vectorization for the captions was causing a minor \textit{data leakage} from the test set to the train set, we corrected the mistake and implemented a new splitting function by wrapping the \href{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html}{scikit-learn train\_test\_split function} inside a custom function to also manage validation splits.
 
 \subsection{Pre-Trained Models}
-As previously explained, our implementation of the model was completely from scratch. At this point we we encountered a performance bottleneck, impeding any further enhancement of the model. This was probably due to the huge amount of parameters in the model, which were quite a challenging task to train from scratch, even considering our large dataset.
+As previously explained, our implementation of the model was completely from scratch. At this point we encountered a performance bottleneck, impeding any further enhancement of the model. This was probably due to the huge amount of parameters in the model, which were quite a challenging task to train from scratch, even considering our large dataset.
 
 As shown during the course lectures, we decided to try to leverage a \textit{pre-trained} model for both our image and text encoder and perform \textit{transfer learning}.
 
