@@ -84,6 +84,16 @@ class CLIP(tfk.Model):
         print("\n")
         self.text_encoder.summary()
 
+    def save_weights(self, path):
+        self.trainable = False
+        self.compile()
+        super().save_weights(path)
+
+    def load_weights(self, path):
+        self.trainable = False
+        self.compile()
+        super().load_weights(path)
+
 
 def projection(embedding_input, embed_dim, name):
     
@@ -149,9 +159,6 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
 
     clip = CLIP(clip_image_encoder, clip_text_encoder)
     clip.compile(optimizer = tf.optimizers.AdamW(learning_rate=model_settings['learning_rate'], weight_decay=model_settings['weight_decay']))
-
-    text_transformer.trainable = False
-    img_supernet.trainable = False
 
     if load_weights:
         
