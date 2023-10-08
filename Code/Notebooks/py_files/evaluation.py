@@ -7,12 +7,18 @@ import tensorflow as tf
 
 from tqdm import tqdm
 
+# Construct reference dataset for retrieving side data of elements
+def generate_dataset_reference(
+    dataset_eval,                 # Dataset to generate embeddings
+    dataset_ref_map=lambda *x: x, # Lambda mapping function for reference
+):
+    return [e for e in dataset_eval.map(dataset_ref_map).unbatch()]
+
 # Generate the embeddings and the corresponding dataset reference for an image dataset
 def generate_image_embeddings(
     image_encoder,                 # Image encoder of clip model
     dataset_eval,                  # Dataset to generate embeddings (WARNING: the dataset must not be shuffling or have a shuffle buffer size of 1)
     dataset_pred_map=lambda *x: x, # Lambda mapping function for prediction
-    dataset_ref_map=lambda *x: x,  # Lambda mapping function for reference
 ):
     print("Generating image embeddings")
     # Generate image embedding
@@ -20,16 +26,13 @@ def generate_image_embeddings(
         dataset_eval.map(dataset_pred_map),
         verbose=1,
     )
-    # Construct reference dataset for retrieving side data of elements
-    dataset_reference = [e for e in dataset_eval.map(dataset_ref_map).unbatch()]
-    return dataset_reference, image_embeddings
+    return image_embeddings
 
 # Generate the embeddings and the corresponding dataset reference for a text dataset
 def generate_text_embeddings(
     text_encoder,                  # Image encoder of clip model
     dataset_eval,                  # Dataset to generate embeddings (WARNING: the dataset must not be shuffling or have a shuffle buffer size of 1)
     dataset_pred_map=lambda *x: x, # Lambda mapping function for prediction
-    dataset_ref_map=lambda *x: x,  # Lambda mapping function for reference
 ):
     print("Generating image embeddings")
     # Generate text embedding
@@ -37,9 +40,7 @@ def generate_text_embeddings(
         dataset_eval.map(dataset_pred_map),
         verbose=1,
     )
-    # Construct reference dataset for retrieving side data of elements
-    dataset_reference = [e for e in dataset_eval.map(dataset_ref_map).unbatch()]
-    return dataset_reference, text_embeddings
+    return text_embeddings
 
 # Return the results in the form of reference dataset indexes of a text to image retrieval for a series of queries
 def find_t2i_matches(
