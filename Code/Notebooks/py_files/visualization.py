@@ -5,7 +5,8 @@ import matplotlib.image as mpimg
 
 import plotly.graph_objects as go
 
-from evaluation import  EvalMetrics as evm, compute_top_k_accuracy, compute_map_k, compute_mar_k, compute_F1_k
+from evaluation import EvalMetrics as evm, compute_relevant_at_k, compute_top_k_accuracy, \
+    compute_map_k, compute_mar_k, compute_F1_k
 
 # Visualize results for text to image queries
 def visualize_t2i_results(query, matches):

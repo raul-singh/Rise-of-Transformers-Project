@@ -103,7 +103,7 @@ def decode_concepts(concepts, encoder, concept_list, string_form=True):
 
 
 # Retrieve relevant items given a list of queries (DO NOT RUN THIS ON A COMPLETE DATASET!!!)
-def retrieve_relevant(queries, reference_preprocess=lambda x: x, relevance=lambda m, o: m == o):
+def retrieve_relevant(queries, dataset_reference, reference_preprocess=lambda x: x, relevance=lambda m, o: m == o):
     return [
         [element for element in map(reference_preprocess, dataset_reference) if relevance(query, element)]
         for query in queries
@@ -115,7 +115,7 @@ def compute_relevant_at_k(results, dataset_reference, queries=None, k=None, refe
     if not k:
         k = len(results[0])
     if queries:
-        relevant_reference = retrieve_relevant(queries, reference_preprocess=reference_preprocess, relevance=relevance)
+        relevant_reference = retrieve_relevant(queries, dataset_reference, reference_preprocess=reference_preprocess, relevance=relevance)
     else:
         relevant_reference = map(reference_preprocess, dataset_reference)
     return [ 
@@ -137,7 +137,7 @@ def compute_total_relevance(
     tot_relevant = True
     # Check if queries are passed, if so run general function without loading/saving to file
     if queries:
-        relevant_reference = retrieve_relevant(queries, reference_preprocess=reference_preprocess, relevance=relevance)
+        relevant_reference = retrieve_relevant(queries, dataset_reference, reference_preprocess=reference_preprocess, relevance=relevance)
         return [len(e) for e in relevant_reference]
     # Check for existing file and load relevance data
     if load_from_file:
