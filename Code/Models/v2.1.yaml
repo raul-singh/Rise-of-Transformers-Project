@@ -1,5 +1,4 @@
-# Btach size 10 -> 32
-# Loss: 0.7182
+# Batch size 10 -> 32
 # CONCEPT OVERLAP @ k=10: -> Acc: 72.9631%, MAP: 29.8085%, MAR: 0.5888%, F1: 1.1549%
 
 download:
