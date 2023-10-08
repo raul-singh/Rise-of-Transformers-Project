@@ -7,6 +7,11 @@ import tensorflow as tf
 
 from tqdm import tqdm
 
+METRIC_ACCURACY = "Accuracy"
+METRIC_MAP = "MAP"
+METRIC_MAR = "MAR"
+METRIC_F1 = "F1"
+
 # Construct reference dataset for retrieving side data of elements
 def generate_dataset_reference(
     dataset_eval,                 # Dataset to generate embeddings

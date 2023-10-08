@@ -5,6 +5,9 @@ import matplotlib.image as mpimg
 
 import plotly.graph_objects as go
 
+from evaluation import  METRIC_ACCURACY, METRIC_MAP, METRIC_MAR, METRIC_F1, 
+                        compute_top_k_accuracy, compute_map_k, compute_mar_k, compute_F1_k
+
 # Visualize results for text to image queries
 def visualize_t2i_results(query, matches):
     print("Top matches for query: \"" + query + "\"")
