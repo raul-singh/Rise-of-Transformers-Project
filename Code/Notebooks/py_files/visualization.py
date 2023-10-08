@@ -5,8 +5,8 @@ import matplotlib.image as mpimg
 
 import plotly.graph_objects as go
 
-from evaluation import  METRIC_ACCURACY, METRIC_MAP, METRIC_MAR, METRIC_F1, 
-                        compute_top_k_accuracy, compute_map_k, compute_mar_k, compute_F1_k
+from evaluation import  EvalMetrics as evm, compute_top_k_accuracy, compute_map_k, 
+                        compute_mar_k, compute_F1_k
 
 # Visualize results for text to image queries
 def visualize_t2i_results(query, matches):
@@ -67,14 +67,14 @@ def retrieval_baselines(dataset_reference, total_relevant, k, metrics=[]):
     l = len(dataset_reference)
     metrics_out = {}
     for metric in metrics:
-        if metric["id"] == METRIC_ACCURACY:
-            metrics_out[METRIC_ACCURACY] = sum([ 1 - pow((l - n_el) / l, k) for n_el in total_relevant]) / l
-        elif metric["id"] == METRIC_MAP:
-            metrics_out[METRIC_MAP] = sum([ n_el / l for n_el in total_relevant]) / l
-        elif metric["id"] == METRIC_MAR:
-            metrics_out[METRIC_MAR] = sum([ k / l for n_el in total_relevant]) / l
-        elif metric["id"] == METRIC_F1:
-            metrics_out[METRIC_F1] = compute_F1_k(metrics_out[METRIC_MAP], metrics_out[METRIC_MAR])
+        if metric["id"] == evm.METRIC_ACCURACY:
+            metrics_out[evm.METRIC_ACCURACY] = sum([ 1 - pow((l - n_el) / l, k) for n_el in total_relevant]) / l
+        elif metric["id"] == evm.METRIC_MAP:
+            metrics_out[evm.METRIC_MAP] = sum([ n_el / l for n_el in total_relevant]) / l
+        elif metric["id"] == evm.METRIC_MAR:
+            metrics_out[evm.METRIC_MAR] = sum([ k / l for n_el in total_relevant]) / l
+        elif metric["id"] == evm.METRIC_F1:
+            metrics_out[evm.METRIC_F1] = compute_F1_k(metrics_out[evm.METRIC_MAP], metrics_out[evm.METRIC_MAR])
     return metrics_out
     
 # Computation of a retrieval report containing metrics
@@ -93,14 +93,14 @@ def retrieval_report(
     metrics_out = {}
     
     for metric in metrics:
-        if metric["id"] == METRIC_ACCURACY:
-            metrics_out[METRIC_ACCURACY] = compute_top_k_accuracy(results, reference, relevant)
-        elif metric["id"] == METRIC_MAP:
-            metrics_out[METRIC_MAP] = compute_map_k(results, reference, relevant, k=k)
-        elif metric["id"] == METRIC_MAR:
-            metrics_out[METRIC_MAR] = compute_mar_k(results, reference, relevant, tot_relevant)
-        elif metric["id"] == METRIC_F1:
-            metrics_out[METRIC_F1] = compute_F1_k(metrics_out[METRIC_MAP], metrics_out[METRIC_MAR])
+        if metric["id"] == evm.METRIC_ACCURACY:
+            metrics_out[evm.METRIC_ACCURACY] = compute_top_k_accuracy(results, reference, relevant)
+        elif metric["id"] == evm.METRIC_MAP:
+            metrics_out[evm.METRIC_MAP] = compute_map_k(results, reference, relevant, k=k)
+        elif metric["id"] == evm.METRIC_MAR:
+            metrics_out[evm.METRIC_MAR] = compute_mar_k(results, reference, relevant, tot_relevant)
+        elif metric["id"] == evm.METRIC_F1:
+            metrics_out[evm.METRIC_F1] = compute_F1_k(metrics_out[evm.METRIC_MAP], metrics_out[evm.METRIC_MAR])
             
     if baselines:
             baselines = retrieval_baselines(reference, tot_relevant, k, metrics=metrics)
