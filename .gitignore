@@ -9,6 +9,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Datasets
+Code/Notebooks/resized_train
+Code/Notebooks/*.csv
+
 # C extensions
 *.so
 
