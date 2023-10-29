@@ -130,7 +130,7 @@ def retrieval_graph_report(
     functions=None,                     # Plot pre-existing function data
 ):
     if not functions:
-        functions = {metric["id"]: {"x": [], "y": [], "label": metric["id"], "color": metric["color"], "marker": "0", "opacity": 0.8} for metric in metrics}
+        functions = {metric["id"]: {"x": [], "y": [], "label": metric["id"], "color": metric["color"], "opacity": 0.8} for metric in metrics}
         if baselines:
             functions |= {metric["id"] + "_base": {"x": [], "y": [], "label": metric["id"] + " Baseline", "color": metric["color"], "style": "dash", "opacity": 0.5} for metric in metrics}
         for k in range(k_range[0], k_range[1] + 1):
@@ -161,16 +161,16 @@ def retrieval_graph_compare(
 ):
     if not functions:
         # Add random markers
-        markers = ["0", "1", "2", "3", "17", "26"]
-        if len(markers) < len(model_ids):
+        linestyles = ["solid", "dash", "dot", "dashdot", "longdash", "longdashdot"]
+        if len(linestyles) < len(model_ids):
             print("Too many models!")
             return None
-        markers = random.sample(markers, len(model_ids))
-        model_ids = [model | {"marker": marker} for model, marker in zip(model_ids, markers)]
+        linestyles = linestyles[:len(model_ids)]
+        model_ids = [model | {"style": style} for model, style in zip(model_ids, linestyles)]
         # Generate function models
         functions = {
             metric["id"] + model["id"]: 
-            {"x": [], "y": [], "label": model["label"] + " " + metric["id"], "color": metric["color"], "marker": model["marker"], "opacity": 0.8} 
+            {"x": [], "y": [], "label": model["label"] + " " + metric["id"], "color": metric["color"], "style": model["style"], "opacity": 0.8} 
             for model in model_ids for metric in metrics
         }
         # Fill functions
