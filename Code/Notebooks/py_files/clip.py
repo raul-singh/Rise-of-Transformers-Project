@@ -94,6 +94,12 @@ class CLIP(tfk.Model):
         self.compile()
         super().load_weights(path)
 
+    def save_checkpoint(self, path):
+        super().save_weights(path)
+
+    def load_checkpoint(self, path):
+        super().load_weights(path)
+
 
 def projection(embedding_input, embed_dim, name):
     

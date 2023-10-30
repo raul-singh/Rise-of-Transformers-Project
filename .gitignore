@@ -59,6 +59,7 @@ coverage.xml
 
 # Model weights
 Code/Models/Weights/*.h5
+Code/Models/Weights/ckpts/*
 
 ### LaTeX ###
 
