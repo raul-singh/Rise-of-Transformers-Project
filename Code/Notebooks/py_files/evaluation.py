@@ -45,7 +45,7 @@ def generate_text_embeddings(
     dataset_pred_map=lambda *x: x, # Lambda mapping function for prediction
     dataset_ref_map=lambda *x: x,  # Lambda mapping function for reference
 ):
-    print("Generating image embeddings")
+    print("Generating text embeddings")
     # Generate text embedding
     text_embeddings = text_encoder.predict(
         dataset_eval.map(dataset_pred_map),
