@@ -43,30 +43,17 @@ def generate_text_embeddings(
     text_encoder,                  # Image encoder of clip model
     dataset_eval,                  # Dataset to generate embeddings (WARNING: the dataset must not be shuffling or have a shuffle buffer size of 1)
     dataset_pred_map=lambda *x: x, # Lambda mapping function for prediction
-    dataset_ref_map=lambda *x: x,  # Lambda mapping function for reference
-    is_list=False
+    dataset_ref_map=lambda *x: x,  # Lambda mapping function for referenc
 ):
     print("Generating text embeddings")
+    # Generate text embedding
+    text_embeddings = text_encoder.predict(
+        dataset_eval.map(dataset_pred_map),
+        verbose=1,
+    )
 
-    if is_list:
-        # Generate text embedding
-        text_embeddings = text_encoder.predict(
-            dataset_eval,
-            verbose=1,
-        )
-
-        dataset_reference = None
-    
-    else:
-        # Generate text embedding
-        text_embeddings = text_encoder.predict(
-            dataset_eval.map(dataset_pred_map),
-            verbose=1,
-        )
-
-        # Construct reference dataset for retrieving side data of elements
-        dataset_reference = [e for e in dataset_eval.map(dataset_ref_map).unbatch()]
-
+    # Construct reference dataset for retrieving side data of elements
+    dataset_reference = [e for e in dataset_eval.map(dataset_ref_map).unbatch()]
     return dataset_reference, text_embeddings
 
 # Return the results in the form of reference dataset indexes of a text to image retrieval for a series of queries
