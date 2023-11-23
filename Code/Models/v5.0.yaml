@@ -1,0 +1,22 @@
+download:
+  text_preprocess: https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3
+  text_transformer:  https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-4_H-512_A-8/1
+  img_preprocess: efficientnet
+  img_supernet: EfficientNetV2S
+
+model:
+  img_input_shape:
+    - 128
+    - 128
+    - 3
+  embed_dim: 64
+  learning_rate: 0.0001
+  weight_decay: 0.1
+  weights_path: ../Models/Weights/v4.0.h5
+  image_tta:
+    - tfkl.RandomRotation(0.05, seed=42)
+    - tfkl.RandomContrast(0.01, seed=42)
+    - tfkl.RandomBrightness(0.1, (0,1), seed=42)
+  text_tta:
+    - RandomSwapWords(p=0.2, seed=42)
+  tta_n: 10
