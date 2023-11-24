@@ -11,17 +11,26 @@ kb = tf.keras.backend
 
 
 class CLIP(tfk.Model):
-    def __init__(self, image_encoder, text_encoder, **kwargs):
+    def __init__(self, image_encoder, text_encoder, image_tta=None, text_tta=None, tta_n=10, **kwargs):
         super().__init__(**kwargs)
         self.image_encoder = image_encoder
         self.text_encoder = text_encoder
         self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.temp = self.add_weight(name='t',
-                                 shape=(1, ),
-                                 initializer=tfk.initializers.Constant(1.),
-                                 trainable=True)
+        self.temp = self.add_weight(
+            name='t',
+            shape=(1, ),
+            initializer=tfk.initializers.Constant(1.),
+            trainable=True
+        )
 
-        self.call_model()
+        # Necessary for initialization
+        self.image_tta = None
+        self.text_tta = None
+        self.initialize_model()
+
+        self.image_tta = image_tta
+        self.text_tta = text_tta
+        self.tta_n = tta_n
 
         
     @property
@@ -29,8 +38,15 @@ class CLIP(tfk.Model):
         return [self.loss_tracker]
 
     def call(self, features, training=False):
-        image_emb = self.image_encoder(features["image"], training=training)
-        text_emb = self.text_encoder(features["caption"], training=training)
+        
+        if self.image_tta and not training:
+            image_emb = tf.math.reduce_mean(tf.stack([self.image_encoder(self.image_tta(features["image"])) for _ in range(self.tta_n)]))
+        else:
+            image_emb = self.image_encoder(features["image"], training=training)
+        if self.text_tta and not training:
+            text_emb = tf.math.reduce_mean(tf.stack([self.text_encoder(tf.stack([self.text_tta({"caption": feature})["caption"] for feature in features["caption"]])) for _ in range(self.tta_n)])) # Pipeline is optimized for data preprocessing, thus ["caption"] must be accessed after call and a reshape is needed
+        else:
+            text_emb = self.text_encoder(features["caption"], training=training)
         return image_emb, text_emb
 
     def CLIP_loss(self, image_emb, text_emb):
@@ -66,7 +82,8 @@ class CLIP(tfk.Model):
         self.loss_tracker.update_state(loss)
         return {"loss": self.loss_tracker.result()}
 
-    def call_model(self):
+    # Workaround
+    def initialize_model(self):
 
         image = tf.reshape(tf.convert_to_tensor(np.zeros((128,128,3))), (1,128,128,3))
         caption = tf.convert_to_tensor(["Hello there"], dtype=tf.string)
@@ -163,8 +180,36 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
     clip_text_encoder = text_encoder(model_settings['embed_dim'], text_preprocess, text_transformer)
     clip_image_encoder = image_encoder(image_shape, model_settings['embed_dim'], img_supernet, img_preprocess)
 
-    clip = CLIP(clip_image_encoder, clip_text_encoder)
-    clip.compile(optimizer = tf.optimizers.AdamW(learning_rate=model_settings['learning_rate'], weight_decay=model_settings['weight_decay']))
+    image_tta = None
+    text_tta = None
+    tta_n = None
+
+    if 'tta' in model_settings:
+
+        tta_settings = model_settings['tta']
+        tta_n = tta_settings['tta_n']
+
+        if 'text_tta' in tta_settings:
+            text_tta = tta_settings['text_tta']
+
+        if 'image_tta' in tta_settings:
+            image_tta = tta_settings['image_tta']
+
+
+    clip = CLIP(
+        clip_image_encoder, 
+        clip_text_encoder, 
+        image_tta,
+        text_tta,
+        tta_n
+        )
+    
+    clip.compile(
+        optimizer = tf.optimizers.AdamW(
+            learning_rate=model_settings['learning_rate'], 
+            weight_decay=model_settings['weight_decay']
+            )
+        )
 
     if load_weights:
         
