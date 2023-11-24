@@ -175,25 +175,14 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
     model_settings = model['model']
     image_shape = tuple(model_settings['img_input_shape'])
 
+    image_tta = tfk.Sequential([eval(tta_setting) for tta_setting in model_settings['image_tta']]) if 'image_tta' in model_settings else None
+    text_tta = tfk.Sequential([eval(tta_setting) for tta_setting in model_settings['image_tta']]) if 'image_tta' in model_settings else None
+    tta_n = model_settings['tta_n'] if 'tta_n' in model_settings else None
+
     print('Building clip...')
 
     clip_text_encoder = text_encoder(model_settings['embed_dim'], text_preprocess, text_transformer)
     clip_image_encoder = image_encoder(image_shape, model_settings['embed_dim'], img_supernet, img_preprocess)
-
-    image_tta = None
-    text_tta = None
-    tta_n = None
-
-    if 'tta' in model_settings:
-
-        tta_settings = model_settings['tta']
-        tta_n = tta_settings['tta_n']
-
-        if 'text_tta' in tta_settings:
-            text_tta = tta_settings['text_tta']
-
-        if 'image_tta' in tta_settings:
-            image_tta = tta_settings['image_tta']
 
 
     clip = CLIP(
