@@ -1,5 +1,9 @@
 import tensorflow as tf
 
+tfk = tf.keras
+tfkl = tf.keras.layers
+kb = tf.keras.backend
+
 class RandomSwapWords(tfkl.Layer):
     def __init__(self, p=0.5, seed=None):
         super(RandomSwapWords, self).__init__()

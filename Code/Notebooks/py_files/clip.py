@@ -5,6 +5,8 @@ import yaml
 import tensorflow_hub as hub
 import tensorflow_text as text
 
+from py_files.daug import RandomSwapWords, RandomConceptWords
+
 tfk = tf.keras
 tfkl = tf.keras.layers
 kb = tf.keras.backend
@@ -23,14 +25,12 @@ class CLIP(tfk.Model):
             trainable=True
         )
 
-        # Necessary for initialization
-        self.image_tta = None
-        self.text_tta = None
-        self.initialize_model()
-
         self.image_tta = image_tta
         self.text_tta = text_tta
         self.tta_n = tta_n
+
+        # Necessary for initialization
+        self.initialize_model()
 
         
     @property
@@ -47,6 +47,7 @@ class CLIP(tfk.Model):
             text_emb = tf.math.reduce_mean(tf.stack([self.text_encoder(tf.stack([self.text_tta({"caption": feature})["caption"] for feature in features["caption"]])) for _ in range(self.tta_n)])) # Pipeline is optimized for data preprocessing, thus ["caption"] must be accessed after call and a reshape is needed
         else:
             text_emb = self.text_encoder(features["caption"], training=training)
+        
         return image_emb, text_emb
 
     def CLIP_loss(self, image_emb, text_emb):
@@ -176,7 +177,7 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
     image_shape = tuple(model_settings['img_input_shape'])
 
     image_tta = tfk.Sequential([eval(tta_setting) for tta_setting in model_settings['image_tta']]) if 'image_tta' in model_settings else None
-    text_tta = tfk.Sequential([eval(tta_setting) for tta_setting in model_settings['image_tta']]) if 'image_tta' in model_settings else None
+    text_tta = tfk.Sequential([eval(tta_setting) for tta_setting in model_settings['text_tta']]) if 'text_tta' in model_settings else None
     tta_n = model_settings['tta_n'] if 'tta_n' in model_settings else None
 
     print('Building clip...')

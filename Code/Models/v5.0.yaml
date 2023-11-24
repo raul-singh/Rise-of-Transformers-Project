@@ -15,9 +15,9 @@ model:
   weights_path: ../Models/Weights/v4.0.h5
 
   image_tta:
-    - tfkl.RandomRotation(0.05, seed=42)
-    - tfkl.RandomContrast(0.01, seed=42)
-    - tfkl.RandomBrightness(0.1, (0,1), seed=42)
+    - tfkl.RandomRotation(0.2, seed=42)
+    - tfkl.RandomContrast(0.1, seed=42)
+    - tfkl.RandomBrightness(0.2, (0,2), seed=42)
   text_tta:
     - RandomSwapWords(p=0.5, seed=42)
   tta_n: 10
