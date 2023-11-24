@@ -29,6 +29,33 @@ class RandomSwapWords(tfkl.Layer):
         words = tf.tensor_scatter_nd_update(words, original_indexes, tf.gather(words, shuffled_indexes))
         
         return dict(inputs, caption=tf.strings.reduce_join(words, separator=" "))
+
+class RandomSwapWordsTTA(tfkl.Layer):
+    def __init__(self, p=0.5, seed=None):
+        super(RandomSwapWords, self).__init__()
+        self.p = p
+        self.seed = seed
+   
+    def call(self, inputs):
+        def swap_words(caption):
+            words = tf.strings.split(caption, " ")
+
+            if type(words) is tf.RaggedTensor:
+                words = words.to_tensor()
+
+            # Create random shuffle mask
+            shuffle_mask = tf.cast(tf.random.uniform([tf.shape(words)[0]], seed=self.seed) < self.p, tf.int32)
+            # Generate shuffled indexes 
+            indexes = tf.range(tf.shape(words)[0])
+            shuffled_indexes = tf.boolean_mask(tf.random.shuffle(indexes, seed=self.seed), shuffle_mask)
+            original_indexes = tf.where(shuffle_mask > 0)
+
+            # Swap words at shuffled_indexes
+            words = tf.tensor_scatter_nd_update(words, original_indexes, tf.gather(words, shuffled_indexes))
+        
+            return tf.strings.reduce_join(words, separator=" ")
+        
+        return tf.map_fn(fn=swap_words, elems=inputs)
     
 class RandomConceptWords(tfkl.Layer):
     def __init__(self, concept_encoder_classes, concept_list, p=0.5, seed=None):
