@@ -21,4 +21,4 @@ model:
       - tfkl.RandomBrightness(0.1, (0,1), seed=42)
     text_tta:
       - RandomSwapWords(p=0.5, seed=42)
-    tta_n: 20
+    tta_n: 10
