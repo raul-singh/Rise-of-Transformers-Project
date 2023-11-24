@@ -32,7 +32,7 @@ class RandomSwapWords(tfkl.Layer):
 
 class RandomSwapWordsTTA(tfkl.Layer):
     def __init__(self, p=0.5, seed=None):
-        super(RandomSwapWords, self).__init__()
+        super(RandomSwapWordsTTA, self).__init__()
         self.p = p
         self.seed = seed
    
