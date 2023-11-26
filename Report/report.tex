@@ -15,6 +15,7 @@
 \usepackage{amsfonts}   % Math fonts
 \usepackage{amssymb}    % Math symbols
 \usepackage{blindtext}  % Placeholder text
+\usepackage{todonotes}  % TODO notes
 \usepackage{setspace}   % Iterline spacing
 \usepackage{multicol}   % Multicolumns
 \usepackage{wrapfig}    % Figure wrapping
@@ -262,6 +263,48 @@ Both dense layers were configured with 128 neurons, resulting in a 128-dimension
 
 \subsection{Text Embedding}
 \blindtext[1]
+
+\subsection{Data Augmentation}
+To further improve performance we decided to insert data augmentation techniques inside our training and evaluation pipelines.
+All the augmentation modules are given a seed for random number generation in order to improve the reproducibility of the process.
+
+\subsubsection{Classic Data Augmentation}
+Classic data augmentation (DAug) consists of adding minor perturbations of various natures on input training data in order to incentivize the model to generalize.
+Due to the modular nature of our training pipeline, to implement the DAug process, it was sufficient to insert a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
+
+We experimented with various different DAug pipelines, but the following gave us best results:
+\begin{center}
+    \begin{tikzpicture}[node distance=1.5cm]
+        \node (img_pipe) [text width=3cm, left of=dense1] {Image Pipeline:};
+        \node (txt_pipe) [text width=3cm, below of=img_pipe] {Text Pipeline:};
+
+        \node (rot) [block, right of=img_pipe, xshift=3cm] {\makecell[c]{Random Rotation \\ (0.05)}};
+        \node (contr) [block, right of=rot, xshift=3cm] {\makecell[c]{Random Contrast \\ (0.01)}};
+        \node (bright) [block, right of=contr, xshift=3cm] {\makecell[c]{Random Brightness \\ (0.1, [0.1])}};
+
+        \node (conc) [block, right of=txt_pipe, xshift=4cm] {\makecell[c]{Random Concept Words \\ (concept\_list, p=0.2)}};
+        \node (swap) [block, right of=conc, xshift=4cm] {\makecell[c]{Random Swap Words \\ (p=0.2)}};
+
+        \draw [arrow] (rot) -- (contr);
+        \draw [arrow] (contr) -- (bright);
+        \draw [arrow] (conc) -- (swap);
+    \end{tikzpicture}
+\end{center}
+
+All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
+
+The text augmentation modules were implemented by us, drawing inspiration from the \href{https://www.kaggle.com/code/shonenkov/nlp-albumentations}{NLP Albumentations notebook} by Alex Shonenkov.
+The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
+The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
+\todo{insert results}
+
+\subsubsection{Test Time Augmentation}
+Test Time Augmentation (TTA) is slightly different from DAug, as it is performed inside the model, at inference time.
+In order to reduce variance of predictions, the model is given $tta_n$ different augmented versions of the same input sample (plus the original inputs), the model is asked to perform a prediction for all of them, and then average the results to obtain a final prediction.
+
+For TTA we utilized the same augmentation pipeline as in the previous step, with slightly modified parameters to make it more aggressive and without the \texttt{RandomConceptWords} module.
+We then implemented a wrapper for the encoders of the model, that takes as input the actual encoder of the model, an augmentation pipeline, and other TTA parameters (such as $tta_n$). The wrapper produces a modified encoder that performs TTA with the desired parameters whenever is called.
+\todo{insert results}
 
 \subsection{Evaluation}
 In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric, which is not really optimal for various reasons, therefore we decided to write a separate notebook solely dedicated to model evaluation for the two main retrieval tasks.
