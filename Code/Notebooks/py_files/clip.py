@@ -18,7 +18,7 @@ class EncoderTTA(tfk.Model):
         self.tta_n = tta_n
         
     def call(self, features, training=False):
-        return tf.math.reduce_mean(tf.stack([self.encoder(self.tta_pipeline(features)) for _ in range(self.tta_n)], axis=-1), axis=-1)
+        return tf.math.reduce_mean(tf.stack([self.encoder(self.tta_pipeline(features)) for _ in range(self.tta_n)] + [self.encoder(features)], axis=-1), axis=-1)
 
 
 class CLIP(tfk.Model):
