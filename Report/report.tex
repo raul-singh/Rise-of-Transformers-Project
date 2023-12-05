@@ -22,6 +22,7 @@
 \usepackage{caption}    % Captions
 \usepackage{tikz}       % Charts
 \usepackage{makecell}   % Helper for flowcharts
+\usepackage{float}      % Floating images
 
 % Tikz imports and setup for flowcharts
 \usetikzlibrary{shapes.geometric, arrows}
@@ -125,17 +126,17 @@ Concepts can have from \textit{2} to \textit{25989} images associated to them fr
 
 
 \begin{figure}
-        \hspace*{-4.5em}
-        \begin{minipage}{25em}
-            \centering
-            \includegraphics[width=22em]{img/Data_Exploration_2.png}
-            \caption{Concepts per Image}
-        \end{minipage}
-        \begin{minipage}{25em}
-            \centering
-            \includegraphics[width=25em]{img/Data_Exploration_3.png}
-            \caption{Images per Concept}
-        \end{minipage}
+    \hspace*{-4.5em}
+    \begin{minipage}{25em}
+        \centering
+        \includegraphics[width=22em]{img/Data_Exploration_2.png}
+        \caption{Concepts per Image}
+    \end{minipage}
+    \begin{minipage}{25em}
+        \centering
+        \includegraphics[width=25em]{img/Data_Exploration_3.png}
+        \caption{Images per Concept}
+    \end{minipage}
 \end{figure}
 
 
@@ -313,7 +314,7 @@ The text augmentation modules were implemented by us, drawing inspiration from t
 The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
 The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
 
-Even though the direct increase in performance caused by DAug was marginal, it opened up other paths for improvement that were previously unfeasible due to the model overfitting, such as using a larger BERT model and employing a bigger embedding size.
+Even though the direct increase in performance caused by DAug was marginal, it opened up other paths for improvement that were previously unfeasible due to the model overfitting, such as using a larger BERT architectures and employing a bigger embedding size.
 
 \subsubsection{Test Time Augmentation}
 Test Time Augmentation (TTA) is slightly different from DAug, as it is performed inside the model, at inference time.
@@ -322,7 +323,8 @@ In order to reduce variance of predictions, the model is given $tta_n$ different
 For TTA we utilized the same augmentation pipeline as in the previous step, with slightly modified parameters to make it more aggressive and without the \texttt{RandomConceptWords} module.
 We then implemented a wrapper for the encoders of the model, that takes as input the actual encoder of the model, an augmentation pipeline, and other TTA parameters (such as $tta_n$). The wrapper produces a modified encoder that performs TTA with the desired parameters whenever is called.
 
-\todo{Insert results}
+Unfortunately there were no direct improvements by using TTA, at best it resulting in a performance equivalent to the base model.
+With TTA being a self-ensembling method, our guess is that the model is too stable on its predictions to gain any meaningful benefit from this technique.
 
 \subsection{Evaluation}
 In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric, which is not really optimal for various reasons, therefore we decided to write a separate notebook solely dedicated to model evaluation for the two main retrieval tasks.
@@ -345,6 +347,27 @@ This method of evaluation steadily gave worse results than other approaches.
 
 \subsection{Image Retrieval Capabilities}
 \todo{Add image retrieval visualization}
+
+\subsection{Image and Text Retrieval Samples}
+Some sample outputs from the image and text retrieval tasks.
+
+\subsubsection*{Image Retrieval}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=25em]{img/T2I_test1.png}
+\end{figure}
+
+\subsubsection*{Text Retrieval}
+\begin{figure}[H]
+    \begin{minipage}{25em}
+        \centering
+        \includegraphics[width=20em]{img/I2T_test1.png}
+    \end{minipage}
+    \begin{minipage}{20em}
+        \centering
+        \includegraphics[width=20em]{img/I2T_test2.png}
+    \end{minipage}
+\end{figure}
 
 \subsection{Embedding Space}
 
