@@ -343,6 +343,9 @@ This method of evaluation steadily gave worse results than other approaches.
 
 \section{Visualization}
 
+\subsection{Image Retrieval Capabilities}
+\todo{Add image retrieval visualization}
+
 \subsection{Embedding Space}
 
 To effectively demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize its inner workings, specifically how the \text{visual encoder} and the \textit{text encoder} interact. The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors—one for images and one for captions—that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
@@ -362,15 +365,38 @@ The final iteration of the model emerged after implementing various tweaks and a
 
 This chart displays the \textbf{caption equality accuracy} at $k=10$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements in the architecture and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
-\begin{figure}[h]
-    \includegraphics[width=45em]{img/Improvement_Plot.png}
-    \centering
-\end{figure}
+%\begin{figure}[h]
+%    \includegraphics[width=40em]{img/Improvement_Plot.png}
+%    \centering
+%\end{figure}
+
+\todo{redo improvement chart with consistent naming}
 
 
 \section{Other Tasks}
 
-\todo{Add classification}
+\subsection{Zero-Shot Image Classification}
+
+Once our model had successfully achieved a high level of performance, we decided to put it to the test in a \textit{zero-shot classification} scenario, as demonstrated and utilized in the CLIP paper.
+
+The fundamental idea behind this approach involves having a set of textual classes serving as our classification labels. When presented with an image for classification, we encode both the image and the classes. Following this, we calculate the similarity between the embedding of the image and the embeddings of the classes. By applying a softmax function in order to sharpen the distribution, we determine the highest similarity score, which becomes our prediction.
+
+\subsubsection{Custom Dataset}
+In order to comprehensively assess our model's classification capabilities, we opted to construct a tailored dataset specifically designed for this purpose. Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of...'} or \textit{ `ultrasound image of...}'. Hence, we embarked on creating a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
+
+To create this dataset, we utilized our test dataset, to avoid any potential biases. We built a piece of code to extract words from a predefined set of labels found within the image captions. These labels were subsequently employed as classes, allowing us to compile a custom dataset. The chosen classes are: \textbf{angiography, echocardiography, ultrasound, tomography, x-ray}.
+
+Upon extracting the images from the test set, we ended up with a dataset comprising 4111 samples, with each sample associated with one of the specified five labels, with the following class distribution of samples: angiography: 299, echocardiography: 211, ultrasound: 520, tomography: 1873, xray: 1208.
+
+\subsubsection{Results}
+We then wrapped the classification procedure in a function and performed evaluation just as we would normally do with a trained classfier.
+
+\begin{figure}[h]
+    \includegraphics[width=30em]{img/Classification_Result.png}
+    \centering
+\end{figure}
+
+These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding our brightest expectations.
 
 \section{Results}
 \blindtext[1]
