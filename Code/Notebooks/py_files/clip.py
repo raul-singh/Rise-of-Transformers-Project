@@ -49,16 +49,6 @@ class CLIP(tfk.Model):
 
         return image_emb, text_emb
         
-        if self.image_tta and not training:
-            image_emb = tf.math.reduce_mean(tf.stack([self.image_encoder(self.image_tta(features["image"])) for _ in range(self.tta_n)]))
-        else:
-            image_emb = self.image_encoder(features["image"], training=training)
-        if self.text_tta and not training:
-            text_emb = tf.math.reduce_mean(tf.stack([self.text_encoder(tf.stack([self.text_tta({"caption": feature})["caption"] for feature in features["caption"]])) for _ in range(self.tta_n)])) # Pipeline is optimized for data preprocessing, thus ["caption"] must be accessed after call and a reshape is needed
-        else:
-            text_emb = self.text_encoder(features["caption"], training=training)
-        
-        
 
     def CLIP_loss(self, image_emb, text_emb):
         norm_image_emb = tf.math.l2_normalize(image_emb, axis=1)
@@ -141,12 +131,23 @@ def projection(embedding_input, embed_dim, name):
     return embeddings
 
 
-def image_encoder(input_shape, embed_dim, supernet, preprocessing, seed=42):
+def image_encoder(input_shape, embed_dim, seed=42, supernet=None, preprocessing=None, grayscale_preprocess=False):
     
     tf.random.set_seed(seed)
 
+    def true_grayscale(input_image):
+        if len(input_image.shape) > 2:
+            tf.math.reduce_mean(input_image, axis=2)
+        return input_image
+
     input_layer = tfkl.Input(shape=input_shape, name='img_input_layer')
-    x = preprocessing(input_layer)
+
+    input_img = input_layer
+
+    if grayscale_preprocess:
+        input_img = tfkl.Lambda(true_grayscale)(input_img)
+
+    x = preprocessing(input_img)
     x = supernet(x)
     x = tfkl.GlobalAveragePooling2D(name='GAP')(x)
 
@@ -188,8 +189,21 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
 
     print('Building clip...')
 
-    clip_text_encoder = text_encoder(model_settings['embed_dim'], text_preprocess, text_transformer)
-    clip_image_encoder = image_encoder(image_shape, model_settings['embed_dim'], img_supernet, img_preprocess)
+    if 'grayscale_preprocess' in model_settings and model_settings['grayscale_preprocess']:
+        grayscale_preprocess = True
+
+    else:
+        grayscale_preprocess = False
+
+    clip_text_encoder = text_encoder(model_settings['embed_dim'], 
+                                     text_preprocess, 
+                                     text_transformer)
+    
+    clip_image_encoder = image_encoder(image_shape, 
+                                       model_settings['embed_dim'], 
+                                       supernet=img_supernet, 
+                                       preprocessing=img_preprocess, 
+                                       grayscale_preprocess=grayscale_preprocess)
 
     clip = CLIP(clip_image_encoder, clip_text_encoder)
     
@@ -203,6 +217,8 @@ def build_clip(settings_path, weights_path=None, load_weights=True):
     if load_weights:
         
         print('Loading parameters...')
+
+        print(model_settings['weights_path'])
 
         weights = model_settings['weights_path'] if weights_path is None else weights_path
         clip.load_weights(weights)
