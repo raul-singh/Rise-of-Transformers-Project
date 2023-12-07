@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper]{article}
+\documentclass[11pt, a4paper]{article}
 
 %%
 % PREAMBLE
@@ -15,7 +15,7 @@
 \usepackage{amsfonts}   % Math fonts
 \usepackage{amssymb}    % Math symbols
 \usepackage{blindtext}  % Placeholder text
-\usepackage{todonotes}  % TODO notes
+% \usepackage{todonotes}  % TODO notes
 \usepackage{setspace}   % Iterline spacing
 \usepackage{multicol}   % Multicolumns
 \usepackage{wrapfig}    % Figure wrapping
@@ -86,7 +86,7 @@
 \pagenumbering{arabic}
 
 % Margins
-\newgeometry{top=1cm,left=1.5cm,right=1.5cm,bottom=2cm}
+\newgeometry{top=1cm,left=1cm,right=1cm,bottom=2cm}
 
 % Introduction
 \section{Introduction}
@@ -124,21 +124,19 @@ Images can have from \textit{1} to \textit{50} concepts associated to them from 
 
 Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept.
 
-
 \begin{figure}
-    \hspace*{-4.5em}
-    \begin{minipage}{25em}
+    \hspace*{-1em}
+    \begin{minipage}{22em}
         \centering
         \includegraphics[width=22em]{img/Data_Exploration_2.png}
-        \caption{Concepts per Image}
+        \caption{\textit{Concepts per Image}}
     \end{minipage}
-    \begin{minipage}{25em}
+    \begin{minipage}{24em}
         \centering
-        \includegraphics[width=25em]{img/Data_Exploration_3.png}
-        \caption{Images per Concept}
+        \includegraphics[width=24em]{img/Data_Exploration_3.png}
+        \caption{\textit{Images per Concept}}
     \end{minipage}
 \end{figure}
-
 
 % Hackathon Results
 \section{Hackathon Results}
@@ -166,7 +164,6 @@ For the image encoding we defined a simple CNN composed by 3 \href{https://www.t
 At the top of the convolutional section we added a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Flatten}{flattening layer} followed by two \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense}{dense layers} to obtain a final embedding of size 128.
 All of the hidden layers have \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/ReLU}{ReLU} activation functions.
 
-% TODO: check positional embedding method
 For the text encoding we used a \textit{transformer encoder block} that was presented during the course lectures, which makes use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/MultiHeadAttention}{multi-head attention}, \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/LayerNormalization}{layer normalization} and \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dropout}{dropout} layers; at the end of the block there are 2 \textit{dense layers} to obtain a final embedding of size 128.
 Before being fed to the encoder block, inputs pass through a double \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Embedding}{embedding layer} that implements \textit{positional embedding} by addition.
 
@@ -327,7 +324,7 @@ Unfortunately there were no direct improvements by using TTA, at best it resulti
 With TTA being a self-ensembling method, our guess is that the model is too stable on its predictions to gain any meaningful benefit from this technique.
 
 \subsection{Grayscale Preprocess}
-We noticed that most of the images contained in the dataset are grayscale images. However, they are stored as RGB images, with a shape of $ 128 \times 128 \times 3 $. Being grayscale, the third dimension is completely redundant and we know that additional dimensions can severely impact the model's performance. To address this, we implemented a solution by introducing a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{Lambda layer} at the beginning of the image encoder. This layer calculates the average across the RGB channels (the third dimension) for inputs with three dimensions, effectively creating a simple color-to-grayscale conversion algorithm that outputs a 2-dimensional image. For inputs already in grayscale with two dimensions, the layer remains inactive.
+We noticed that most of the images contained in the dataset are grayscale images. However, they are stored as RGB images, with a shape of $ 128 \times 128 \times 3 $. Being grayscale, the third dimension is completely redundant, and we know that additional dimensions can severely impact the model's performance. To address this, we implemented a solution by introducing a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{Lambda layer} at the beginning of the image encoder. This layer calculates the average across the RGB channels (the third dimension) for inputs with three dimensions, effectively creating a simple color-to-grayscale conversion algorithm that outputs a 2-dimensional image. For inputs already in grayscale with two dimensions, the layer remains inactive.
 
 
 This modification ensures seamless compatibility of the encoder with our existing infrastructure, requiring no alterations. Consequently, our model can effectively process both grayscale and RGB inputs. This way, our image encoder now operates on dimensions of $128 \times 128$.
@@ -359,42 +356,44 @@ Some sample outputs from the image and text retrieval tasks.
 \subsubsection*{Image Retrieval}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=25em]{img/T2I_test1.png}
+    \includegraphics[width=28em]{img/T2I_test1.png}
 \end{figure}
 
 \subsubsection*{Text Retrieval}
 \begin{figure}[H]
-    \begin{minipage}{25em}
+    \begin{minipage}{26em}
         \centering
-        \includegraphics[width=20em]{img/I2T_test1.png}
+        \includegraphics[width=23em]{img/I2T_test1.png}
     \end{minipage}
-    \begin{minipage}{20em}
+    \begin{minipage}{23em}
         \centering
-        \includegraphics[width=20em]{img/I2T_test2.png}
+        \includegraphics[width=23em]{img/I2T_test2.png}
     \end{minipage}
 \end{figure}
 
 \subsection{Model Architecture Improvement}
 
-The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment underwent meticolous evaluation using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
+The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment underwent meticulous evaluation using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
 
 This chart displays the \textbf{caption equality accuracy} at $k=10$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements in the architecture and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
-\begin{figure}[!h]
-    \includegraphics[width=44em]{img/Improvement_Plot.png}
+\begin{figure}[H]
     \centering
+    \includegraphics[width=42em]{img/Improvement_Plot.png}
 \end{figure}
 
 \subsection{Embedding Space}
 
+\begin{wrapfigure}[15]{r}{20em}
+    \centering
+    \includegraphics[width=15em]{img/Diagonal.png}
+    \caption{\textit{Diagonal trend in embeddings}}
+\end{wrapfigure}
+
 To effectively demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize its inner workings, specifically how the \text{visual encoder} and the \textit{text encoder} interact. The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors—one for images and one for captions—that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
 
-To illustrate this concept, we selected a random batch of 32 samples from the test dataset. We then employed their respective encoders to encode both the images and their associated captions. Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
-\begin{figure}[h!]
-    \includegraphics[width=20em]{img/Diagonal.png}
-    \centering
-\end{figure}
+To illustrate this concept, we selected a random batch of 32 samples from the test dataset. We then employed their respective encoders to encode both the images and their associated captions. Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
 As expected, our observations reveal a clear diagonal trend within the visualization. This trend distinctly illustrates that images and captions originating from the same sample show a notably high degree of similarity, denoted by a brighter color in the visualization. Conversely, when comparing images and captions from different samples, the similarity appears significantly lower, depicted by a darker color.
 
@@ -405,23 +404,25 @@ Once our model had successfully achieved a high level of performance, we decided
 The fundamental idea behind this approach involves having a set of textual classes serving as our classification labels. When presented with an image for classification, we encode both the image and the classes. Following this, we calculate the similarity between the embedding of the image and the embeddings of the classes. By applying a softmax function in order to sharpen the distribution, we determine the highest similarity score, which becomes our prediction.
 
 \subsection{Custom Dataset}
-In order to comprehensively assess our model's classification capabilities, we opted to construct a tailored dataset specifically designed for this purpose. Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of...'} or \textit{ `ultrasound image of...}'. Hence, we decided to create a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
+In order to comprehensively assess our model's classification capabilities, we opted to construct a tailored dataset specifically designed for this purpose. Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of\ldots'} or \textit{ `ultrasound image of\ldots}'. Hence, we decided to create a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
 
 To create this dataset, we utilized our test dataset, to avoid any potential biases. We built a piece of code to extract words from a predefined set of labels found within the image captions. These labels were subsequently employed as classes, allowing us to compile a custom dataset. The chosen classes are: \textbf{angiography, echocardiography, ultrasound, tomography, x-ray}.
 
 Upon extracting the images from the test set, we ended up with a dataset comprising 4111 samples, with each sample associated with one of the specified five labels, with the following class distribution of samples: angiography: 299, echocardiography: 211, ultrasound: 520, tomography: 1873, xray: 1208.
 
 \subsection{Results}
-We then wrapped the classification procedure in a function and performed evaluation just as we would normally do with a trained classfier.
 
-\begin{figure}[h]
-    \includegraphics[width=30em]{img/Classification_Result.png}
+\begin{wrapfigure}{r}{26em}
     \centering
-\end{figure}
+    \includegraphics[width=26em]{img/Classification_Result.png}
+\end{wrapfigure}
+
+We then wrapped the classification procedure in a function and performed evaluation just as we would normally do with a trained classifier.
+
+As it's possible to observe from the confusion matrix visualization, the model's predictions seem well-balanced as a faint diagonal is present.
+However, there might be some slight bias towards the angiography class as it is the one with the most false positive predictions associated overall.
+This is possibly due to the conceptual overlap between the angiography technique and other types of exams such as x-ray and tomography.
 
 These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding our brightest expectations.
-
-\section{Results}
-\blindtext[1]
 
 \end{document}
