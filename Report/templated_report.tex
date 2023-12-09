@@ -201,8 +201,8 @@ Both dense layers were configured with 128 neurons, resulting in a 128-dimension
 
 \begin{figure}[H]
    \centering
-   \includegraphics[width=0.6\linewidth]{img/T2I_test1.png}
-   \caption{Placeholder}
+   \includegraphics[width=1\linewidth]{img/Tikz_Model.png}
+   \caption{\textit{Model Layout}}
 \end{figure}  
 
 \subsection{Loss Function Tweaks}
@@ -236,13 +236,13 @@ Due to the modular nature of our training pipeline, to implement the DAug proces
 We experimented with various different DAug pipelines, but the following gave us best results:
 \begin{figure}[H]
    \centering
-   \includegraphics[width=0.5\linewidth]{img/T2I_test1.png}
-   \caption{Placeholder}
+   \includegraphics[width=1\linewidth]{img/Tikz_Daug_1.png}
+   \caption{\textit{Image Pipeline}}
 \end{figure}
 \begin{figure}[H]
    \centering
-   \includegraphics[width=0.5\linewidth]{img/T2I_test1.png}
-   \caption{Placeholder}
+   \includegraphics[width=0.8\linewidth]{img/Tikz_Daug_2.png}
+   \caption{\textit{Text Pipeline}}
 \end{figure}
 
 All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
