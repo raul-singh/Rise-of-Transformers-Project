@@ -37,7 +37,7 @@
 
 \author{Raul Singh\\
 Politecnico di Milano\\
-{\tt\small raul9.singh@mail.polimi.it}
+{\tt\small raul.singh@mail.polimi.it}
 \and
 Davide Rigamonti\\
 Politecnico di Milano\\
@@ -212,7 +212,7 @@ We made several attempts to refine the loss function while implementing various 
 Initially, we aimed to penalize the loss associated with similarities among distinct samples. This involved amplifying the loss tied to these similarities by a specified hyperparameter to further encourage the model to minimize similarities between different samples. Unfortunately, this approach proved unsuccessful, significantly compromising the model's performance.
 
 \subsubsection{Weighted Loss}
-Our subsequent attempt involved employing a weighted average strategy. In the original CLIP paper, the authors independently computed the loss for the image encoder and the text encoder, averaging these values. We attempted to improve this approach by weighting this average as follows: $\alpha \cdot L_{img} + (1 - \alpha) \cdot L_{txt}$. We experimented with both using $\alpha$ as a hyperparameter and as a trainable parameter (confined between 0 and 1). However, both attempts yielded no improvement. Interestingly, in the case of the trainable parameter, the resulting $\alpha$ value converged remarkably close to 0.5 after training. This indicated that employing a weighted average was futile, and a regular average remained the optimal choice.
+Our subsequent attempt involved employing a weighted average strategy. In the original CLIP paper, the authors independently computed the loss for the image encoder and the text encoder, averaging these values. We attempted to improve this approach by weighting this average as follows: $\alpha \cdot L_{img} + (1 - \alpha) \cdot L_{txt}$ (where $L_{img}$ is the loss associated to the image encoder, $L_{txt}$ to the text encoder). We experimented with both using $\alpha$ as a hyperparameter and as a trainable parameter (confined between 0 and 1). However, both attempts yielded no improvement. Interestingly, in the case of the trainable parameter, the resulting $\alpha$ value converged remarkably close to 0.5 after training. This indicated that employing a weighted average was futile, and a regular average remained the optimal choice.
 
 
 \subsubsection{Geometric Mean}
@@ -336,7 +336,7 @@ Subsequently, we normalized these embeddings and computed similarities by perfor
 \begin{figure}[H]
    \centering
    \includegraphics[width=0.6\linewidth]{img/Diagonal.png}
-   \caption{\textit{Diagonal rend in embeddings}}
+   \caption{\textit{Diagonal trend in embeddings}}
 \end{figure}
 
 As expected, our observations reveal a clear \textit{diagonal trend} within the visualization.
