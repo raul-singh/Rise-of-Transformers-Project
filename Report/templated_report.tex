@@ -66,7 +66,7 @@ We used \href{https://jupyter.org/}{Jupyter Notebooks} as a way to organize our 
 
 \subsection{Task}
 The central challenge for this project is to develop a functional implementation of the \href{https://openai.com/}{OpenAI} \textbf{CLIP} model for the main task of \textbf{image retrieval} in a biomedical application.
-The following \href{https://openai.com/research/clip}{blog post} and \href{https://arxiv.org/pdf/2103.00020.pdf}{research paper} were given in the assignment as a starting point for understanding the principles of the model, in addition to the information already given by Professor Giacomo Boracchi during the course's frontal lectures.
+The following blog post \cite{clip_blog} and research paper \cite{clip_paper} were given in the assignment as a starting point for understanding the principles of the model, in addition to the information already given by Professor Giacomo Boracchi during the course's frontal lectures.
 
 \subsubsection*{CLIP Principles}
 In short, \textbf{CLIP} stands for \textbf{C}ontrastive \textbf{L}anguage-\textbf{I}mage \textbf{P}re-training, and it is composed by two \textit{encoders} (one dedicated to images and one for text) which are trained to minimize the loss computed as the \textit{cosine similarity} of the embedded image pairs.
@@ -75,7 +75,7 @@ This peculiar pre-training technique enables the model to achieve relevant perfo
 
 \subsection{Dataset Analysis}
 
-The dataset provided is a \textit{simplified} version of the \href{https://link.springer.com/chapter/10.1007/978-3-030-01364-6_20}{\textbf{ROCO} dataset} (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) which consists of \textit{83275} elements composed of:
+The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) \cite{roco} which consists of \textit{83275} elements composed of:
 
 \begin{itemize}
    \item A low resolution image that has been reduced in size.
@@ -249,7 +249,7 @@ We experimented with various different DAug pipelines, but the following gave us
 
 All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
 
-The text augmentation modules were implemented by us, drawing inspiration from the \href{https://www.kaggle.com/code/shonenkov/nlp-albumentations}{NLP Albumentations notebook} by Alex Shonenkov.
+The text augmentation modules were implemented by us, drawing inspiration from the NLP Albumentations notebook by Alex Shonenkov \cite{nlp_alb}.
 The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
 The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
 
@@ -379,7 +379,7 @@ These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding ou
 
 %------------------------------------------------------------------------
 \section{Conclusions}
-TODO Conclusions.\cite{steinhardt, lipton}
+TODO Conclusions.
 
 %-------------------------------------------------------------------------
 
