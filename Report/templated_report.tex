@@ -156,7 +156,7 @@ Some of these improvements are strictly related to the model structure and perfo
 We decided to reimplement the loss function and how it is integrated inside the CLIP model from scratch as we previously made use of \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/Lambda}{TensorFlow lambda layers} to perform mathematical operations.
 We noticed that these layers were causing problems in both the gradient calculation process and during import/export operations.
 
-The approach we took for the new loss was quite radical as we decided to delve into the \href{https://www.tensorflow.org/api_docs/python/tf/keras/Model}{Keras model} by \textit{overriding} the \texttt{train\char`_step} and \texttt{text\char`_step} in order to have more control on how the model calculates loss and how it performs its backpropagation process.
+The approach we took for the new loss was quite radical as we decided to delve into the \href{https://www.tensorflow.org/api_docs/python/tf/keras/Model}{Keras model} by \textit{overriding} the \texttt{train\char`_step} and \texttt{test\char`_step} in order to have more control on how the model calculates loss and how it performs its backpropagation process.
 Although we modified the overall structure of the model, the mathematical essence of the loss function remains the same as the one defined in the reference OpenAI paper.
 
 \subsection{Lazy Loading}
@@ -182,8 +182,8 @@ Further in the project development, we tried most of the CNNs available on the \
 As for the text encoder, we employed \href{https://huggingface.co/docs/transformers/model_doc/bert}{BERT} as our preferred \textit{text transformer}.
 We initially utilized the base version of the transformer as a foundation.
 
-Importing and integrating the model as a layer within our architecture posed a challenge, given that most methods are designed for standalone use of these models.
-In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and seamlessly incorporating it into our model.
+Importing and integrating the model as a layer within our architecture was challenging, given that most methods are designed for standalone use of these models for common tasks like classification.
+In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and incorporating it into our model. This allowed us to employ slimmed down versions of BERT to avoid overfitting, such as BERT 4L (BERT with only 4 transformer layers) and BERT 2L (2 transformer layers).
 
 \subsection{Embedding Projection}
 As previously explained, our architecture comprises the following components:
@@ -193,7 +193,7 @@ As previously explained, our architecture comprises the following components:
 \end{itemize}
 The purpose of the 2-layer dense network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
 In an effort to enhance this projection, we engaged in thorough experimentation.
-After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, culminating in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
+After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, ending in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
 
 We also explored various activation functions, starting with \href{https://keras.io/api/layers/activation_layers/relu/}{ReLU} and subsequently testing \href{https://www.tensorflow.org/api_docs/python/tf/keras/activations/gelu}{GELU}, \href{https://www.tensorflow.org/api_docs/python/tf/nn/silu}{SiLU}, and \href{https://www.tensorflow.org/api_docs/python/tf/nn/selu}{SELU}. Ultimately, SELU demonstrated a significant improvement, prompting us to adopt it for the projection.
 
@@ -205,6 +205,8 @@ Both dense layers were configured with 128 neurons, resulting in a 128-dimension
    \caption{\textit{Model Layout}}
 \end{figure}  
 
+We experimented with various embedding space dimensions, initially reducing it to 64 and then further down to 32 after some tinkering. This 32-dimensonal setting proved to be the best for a while. We also tried 16 dimensions but this configuration was not on par with the previous. It was only after significant modifications to our model and the use of \textit{Data Augmentation} that we increased it back to 64, as detailed further in the report.
+
 \subsection{Loss Function Tweaks}
 We made several attempts to refine the loss function while implementing various changes to the model in hopes of enhancing its performance.
 
@@ -212,7 +214,7 @@ We made several attempts to refine the loss function while implementing various 
 Initially, we aimed to penalize the loss associated with similarities among distinct samples. This involved amplifying the loss tied to these similarities by a specified hyperparameter to further encourage the model to minimize similarities between different samples. Unfortunately, this approach proved unsuccessful, significantly compromising the model's performance.
 
 \subsubsection{Weighted Loss}
-Our subsequent attempt involved employing a weighted average strategy. In the original CLIP paper, the authors independently computed the loss for the image encoder and the text encoder, averaging these values. We attempted to improve this approach by weighting this average as follows: $\alpha \cdot L_{img} + (1 - \alpha) \cdot L_{txt}$ (where $L_{img}$ is the loss associated to the image encoder, $L_{txt}$ to the text encoder). We experimented with both using $\alpha$ as a hyperparameter and as a trainable parameter (confined between 0 and 1). However, both attempts yielded no improvement. Interestingly, in the case of the trainable parameter, the resulting $\alpha$ value converged remarkably close to 0.5 after training. This indicated that employing a weighted average was futile, and a regular average remained the optimal choice.
+Our subsequent attempt involved employing a weighted average strategy. In the original CLIP paper, the authors independently computed the loss for the image encoder and the text encoder, then averaging these values. We attempted to improve this approach by weighting this average as follows: $\alpha \cdot L_{img} + (1 - \alpha) \cdot L_{txt}$ (where $L_{img}$ is the loss associated to the image encoder, $L_{txt}$ to the text encoder). We experimented with both using $\alpha$ as a hyperparameter and as a trainable parameter (confined between 0 and 1). However, both attempts yielded no improvement. Interestingly, in the case of the trainable parameter, the resulting $\alpha$ value converged remarkably close to $0.5$ after training. This indicated that employing a weighted average was futile, and a regular average remained the optimal choice.
 
 
 \subsubsection{Geometric Mean}
