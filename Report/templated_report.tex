@@ -379,7 +379,14 @@ These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding ou
 
 %------------------------------------------------------------------------
 \section{Conclusions}
-TODO Conclusions.
+
+In conclusion, this project faced several challenges, mainly due to the model's unconventional architecture. Initially, we built both encoders from scratch to test the limits of this base design and apply our knowledge about the \textit{transformer} achitecture that we learned from the course. However, this approach started showing limitations over time, leading us to shift to pre-trained models.
+
+To improve the model, we used traditional deep learning techniques such as adding \textit{skip connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods. Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. Moreover, dealing with a large model and a huge dataset required optimizations like \textit{lazy loading} to work effectively with the complete dataset.
+
+Our efforts to adjust the loss function proved unsuccesful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
+
+Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
 
 %-------------------------------------------------------------------------
 
