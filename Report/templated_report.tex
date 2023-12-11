@@ -49,7 +49,13 @@ Politecnico di Milano\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-   TODO The ABSTRACT should be self-contained and explain what the paper is about. Usually abstracts are no longer than 300 words. You should state what are the main contributions of your work and tempt the reader to continue to read your paper. A good abstract briefly describes your problem, approach, and key results. This document is based on the CVPR submission template, and it has been adapted to submit a technical report of a project of the Deep Learning and Image Classification course.
+This paper documents the iterative development and enhancements of a custom CLIP-based model for a biomedical application utilizing the ROCO dataset, culminating from a hackathon held for the Advanced Topics in Deep Learning course.
+Initiated with manually implemented encoder blocks and basic training/evaluation strategies, the project evolved into leveraging pre-trained models like ConvNeXt and BERT, aiming to optimize performance and mitigate overfitting issues.
+Significant enhancements with respect to the baseline model emerged from improvements in the model, the training pipeline, the evaluation metrics and the visualization techniques.
+Some of these improvements, such as lazy loading for the data pipeline, already got explored during the hackathon and were improved upon in the following time; other techniques, such as the use of pre-trained models and data augmentation, were added as novel improvements upon the base model.
+The main two tasks that have been tackled are image and text retrieval, however an additional zero-shot task in the form of image classification has been considered and showcased in order to demonstrate the model's adaptability.
+Evaluating the model's performance relied on custom metrics like Concept Overlap and Caption Equality, which were specifically crafted to enable easy understanding of the model's capabilities and simple comparisons with the task baselines. 
+Conclusively, this project showcased a progressive transition from a barely functioning model, to an optimized architecture that performs fairly well according to the proposed evaluation metrics.
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
@@ -380,11 +386,11 @@ These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding ou
 %------------------------------------------------------------------------
 \section{Conclusions}
 
-In conclusion, this project faced several challenges, mainly due to the model's unconventional architecture. Initially, we built both encoders from scratch to test the limits of this base design and apply our knowledge about the \textit{transformer} achitecture that we learned from the course. However, this approach started showing limitations over time, leading us to shift to pre-trained models.
+In conclusion, this project faced several challenges, mainly due to the model's unconventional architecture. Initially, we built both encoders from scratch to test the limits of this base design and apply our knowledge about the \textit{transformer} architecture that we learned from the course. However, this approach started showing limitations over time, leading us to shift to pre-trained models.
 
 To improve the model, we used traditional deep learning techniques such as adding \textit{skip connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods. Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. Moreover, dealing with a large model and a huge dataset required optimizations like \textit{lazy loading} to work effectively with the complete dataset.
 
-Our efforts to adjust the loss function proved unsuccesful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
+Our efforts to adjust the loss function proved unsuccessful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
 
 Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
 
