@@ -62,13 +62,14 @@ Conclusively, this project showcased a progressive transition from a barely func
 %------------------------------------------------------------------------
 \section{Introduction}
 This is a project that has been developed in the context of the \textit{Advanced Topics in Deep Learning: The Rise of Transformers} course held at \textit{Politecnico di Milano} and supervised by Professor Matteo Matteucci.
-The initial assignment was carried out as a one-day hackathon held at Politecnico on the 1st of February 2023.
-Then, groups composed of M.Sc.\ students were asked to improve upon their initial design in order to overtake their baseline performance by means of creative additions and overall improvements.
+The initial assignment was carried out as a one-day hackathon held at Politecnico on the 1st of February 2023. Then, groups composed of M.Sc.\ students were asked to improve upon their initial design.
 
-Groups were expected to implement their designs from scratch, without copy-pasting pieces of code from the assigned references.
-The language recommended for the implementation is \href{https://www.python.org/}{Python}, with the addition of the \href{https://www.tensorflow.org/}{TensorFlow}/\href{https://keras.io/}{Keras} libraries.
 
-We used \href{https://jupyter.org/}{Jupyter Notebooks} as a way to organize our work into self-contained and meaningful subtasks, we utilized \href{https://www.kaggle.com/}{Kaggle} and \href{https://colab.research.google.com}{Google Colab} as means to access computing power to train our models when local resources weren't available to us and lastly, we chose \LaTeX~to write the final report.
+%Then, groups composed of M.Sc.\ students were asked to improve upon their initial design in order to overtake their baseline performance by means of creative additions and overall improvements.
+%Groups were expected to implement their designs from scratch, without copy-pasting pieces of code from the assigned references.
+%The language recommended for the implementation is \href{https://www.python.org/}{Python}, with the addition of the \href{https://www.tensorflow.org/}{TensorFlow}/\href{https://keras.io/}{Keras} libraries.
+
+%We used \href{https://jupyter.org/}{Jupyter Notebooks} as a way to organize our work into self-contained and meaningful subtasks, we utilized \href{https://www.kaggle.com/}{Kaggle} and \href{https://colab.research.google.com}{Google Colab} as means to access computing power to train our models when local resources weren't available to us and lastly, we chose \LaTeX~to write the final report.
 
 \subsection{Task}
 The central challenge for this project is to develop a functional implementation of the \href{https://openai.com/}{OpenAI} \textbf{CLIP} model for the main task of \textbf{image retrieval} in a biomedical application.
@@ -179,7 +180,7 @@ As previously explained, our implementation of the model was completely from scr
 As shown during the course lectures, we decided to try to leverage a \textit{pre-trained} model for both our image and text encoder and perform \textit{transfer learning}.
 
 \subsubsection{Image Encoder}
-For the image encoder, we chose to utilize a \href{https://github.com/facebookresearch/ConvNeXt}{ConvNeXt} network via the \href{https://keras.io/api/applications/}{Keras Applications API}, specifically the \href{https://keras.io/api/applications/convnext/#convnexttiny-function}{ConvNeXtTiny} variant, known for its compact size yet commendable performance.
+For the image encoder, we chose to utilize a \href{https://github.com/facebookresearch/ConvNeXt}{ConvNeXt} network via the \href{https://keras.io/api/applications/}{Keras Applications API}, specifically the \href{https://keras.io/api/applications/convnext/#convnexttiny-function}{ConvNeXtTiny} variant. %known for its compact size yet commendable performance.
 We made this selection based on two primary reasons: firstly, to opt for a reasonably sized and efficient CNN to mitigate the risk of overfitting, and secondly, due to our past projects demonstrating impressive results with this network, making it a logical starting point.
 
 Further in the project development, we tried most of the CNNs available on the \href{https://keras.io/api/applications/}{Keras Applications API}, and achieved a substantial improvement using the \href{https://keras.io/api/applications/efficientnet_v2/#efficientnetv2s-function}{EfficentNetV2S} over the \textit{ConvNeXtTiny}.
@@ -188,7 +189,8 @@ Further in the project development, we tried most of the CNNs available on the \
 As for the text encoder, we employed \href{https://huggingface.co/docs/transformers/model_doc/bert}{BERT} as our preferred \textit{text transformer}.
 We initially utilized the base version of the transformer as a foundation.
 
-Importing and integrating the model as a layer within our architecture was challenging, given that most methods are designed for standalone use of these models for common tasks like classification.
+%Importing and integrating the model as a layer within our architecture was challenging, given that most methods are designed for standalone use of these models for common tasks like classification.
+Importing the model into our architecture was challenging, given that most methods are designed for standalone use of these models for common tasks like classification.
 In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and incorporating it into our model. This allowed us to employ slimmed down versions of BERT to avoid overfitting, such as BERT 4L (BERT with only 4 transformer layers) and BERT 2L (2 transformer layers).
 
 \subsection{Embedding Projection}
@@ -227,8 +229,8 @@ Our subsequent attempt involved employing a weighted average strategy. In the or
 Given that weighting the mean did not yield improvements, we experimented with various types of means for computing the final loss value, primarily focusing on the \textit{geometric mean}, represented in our case as: $\sqrt[2]{L_{img} \cdot L_{txt}}$. However, this attempt also proved unsuccessful, prompting us to retain the original formulation of the loss.
 
 \subsection{Encoder Pre-training}
-To enhance the stability of this intensive parameter training, we attempted to introduce a pre-training phase preceding the actual model training. The primary objective was to establish a more stable training process.
-
+We attempted to introduce a pre-training phase preceding the actual model training to increase the stability of the training process.
+%To enhance the stability of this intensive parameter training, we attempted to introduce a pre-training phase preceding the actual model training. The primary objective was to establish a more stable training process.
 The approach involved pre-training the two encoders independently and without projections by incorporating a dense layer on top of them and training them in a multi-label classification scenario, making use of the provided concept dataset as labels. Subsequently, we would remove the dense classification layer and integrate the encoders into our CLIP model, followed by initiating the primary training phase.
 
 Unfortunately, pre-training the text encoder did not yield any improvements; it only prolonged the entire training procedure. However, pre-training the image encoder resulted in a slight but consistent enhancement. Consequently, we opted to retain this initial pre-training for all subsequent iterations of the model.
@@ -325,7 +327,7 @@ For visualization reasons, both image and text data is shown in the results of b
 
 \subsection{Model Architecture Improvement}
 
-The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment underwent meticulous evaluation using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
+The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
 
 This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements in the architecture and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
@@ -338,7 +340,8 @@ This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a c
 
 \subsection{Embedding Space}
 
-To effectively demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize its inner workings, specifically how the \textit{visual encoder} and the \textit{text encoder} interact. The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors (one for images and one for captions) that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
+%To effectively demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize its inner workings, specifically how the \textit{visual encoder} and the \textit{text encoder} interact.  
+To demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize how the \textit{visual encoder} and the \textit{text encoder} interact. The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors (one for images and one for captions) that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
 
 To illustrate this concept, we selected a random batch of 32 samples from the test dataset.
 We then employed their respective encoders to encode both the images and their associated captions.
@@ -393,11 +396,14 @@ These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding ou
 
 In conclusion, this project faced several challenges, mainly due to the model's unconventional architecture. Initially, we built both encoders from scratch to test the limits of this base design and apply our knowledge about the \textit{transformer} architecture that we learned from the course. However, this approach started showing limitations over time, leading us to shift to pre-trained models.
 
-To improve the model, we used traditional deep learning techniques such as adding \textit{skip connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods. Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. Moreover, dealing with a large model and a huge dataset required optimizations like \textit{lazy loading} to work effectively with the complete dataset.
+To improve the model, we used traditional deep learning techniques such as adding \textit{skip connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods. Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. 
+%Moreover, dealing with a large model and a huge dataset required optimizations like \textit{lazy loading} to work effectively with the complete dataset.
 
 Our efforts to adjust the loss function proved unsuccessful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
 
-Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
+Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. 
+%Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. 
+Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
 
 %-------------------------------------------------------------------------
 
