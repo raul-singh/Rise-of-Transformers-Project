@@ -359,7 +359,7 @@ This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a c
 To demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize how the \textit{visual encoder} and the \textit{text encoder} interact. %The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors (one for images and one for captions) that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
 
 To illustrate this, we selected a random batch of 32 samples from the test dataset.
-We then employed their respective encoders to encode both the images and their associated captions and computed similarites among all samples.
+We then employed their respective encoders to encode both the images and their associated captions and computed similarities among all samples.
 %Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
 \begin{figure}[h]
