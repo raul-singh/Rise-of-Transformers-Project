@@ -54,7 +54,8 @@ Initiated with manually implemented encoder blocks and basic training/evaluation
 % Significant enhancements with respect to the baseline model emerged from improvements in the model, the training pipeline, the evaluation metrics and the visualization techniques.
 % Some of these improvements, such as lazy loading for the data pipeline, already got explored during the hackathon and were improved upon in the following time; other techniques, such as the use of pre-trained models and data augmentation, were added as novel improvements upon the base model.
 The main two tasks that have been tackled are image and text retrieval, however an additional zero-shot task in the form of image classification has been considered and showcased in order to demonstrate the model's adaptability.
-Evaluating the model's performance relied on custom metrics like Concept Overlap and Caption Equality, which were specifically crafted to enable easy understanding of the model's capabilities and simple comparisons with the task baselines. 
+Evaluating the model's performance relied on custom metrics like Concept Overlap and Caption Equality.
+%Evaluating the model's performance relied on custom metrics like Concept Overlap and Caption Equality, which were specifically crafted to enable easy understanding of the model's capabilities and simple comparisons with the task baselines. 
 Conclusively, this project showcased a progressive transition from a barely functioning model, to an optimized architecture that performs fairly well according to the proposed evaluation metrics.
 \end{abstract}
 
@@ -78,7 +79,8 @@ The following blog post\cite{clip_blog} and research paper\cite{clip_paper} were
 \subsubsection*{CLIP Principles}
 In short, \textbf{CLIP} stands for \textbf{C}ontrastive \textbf{L}anguage-\textbf{I}mage \textbf{P}re-training, and it is composed by two \textit{encoders} (one dedicated to images and one for text) which are trained to minimize the loss computed as the \textit{cosine similarity} of the embedded image pairs.
 
-This peculiar pre-training technique enables the model to achieve relevant performance metrics on a wide array of zero-shot tasks (such as classification) while using a fraction of the dataset of other popular deep learning models performing the same task.
+% This peculiar pre-training technique enables the model to achieve relevant performance metrics on a wide array of zero-shot tasks (such as classification) while using a fraction of the dataset of other popular deep learning models performing the same task.
+This peculiar pre-training technique enables the model to achieve relevant performance metrics on a wide array of zero-shot tasks while using a minimal dataset.
 
 \subsection{Dataset Analysis}
 
@@ -90,8 +92,9 @@ This peculiar pre-training technique enables the model to achieve relevant perfo
 %   \item A set of concept labels that characterizes the attributes of the image.
 %\end{itemize}
 
-The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext)\cite{roco} which consists of \textit{83275} elements composed of a low resolution image that has been reduced in size, a corresponding textual caption that describes the image, and a set of concept labels that characterizes the attributes of the image.
+% The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext)\cite{roco} which consists of \textit{83275} elements composed of a low resolution image that has been reduced in size, a corresponding textual caption that describes the image, and a set of concept labels that characterizes the attributes of the image.
 
+The provided dataset is a \textit{simplified} version of the \textbf{ROCO} dataset\cite{roco} which consists of \textit{83275} elements composed of a low resolution image, a corresponding textual caption, and a set of concept labels that characterize the attributes of the image.
 There are \textit{80813} unique captions as most of them are present in the database only one time, the most common caption appears in \textit{261} images.
 Images can have from \textit{1} to \textit{50} concepts associated to them from a total of \textit{8374} concepts, averaging around \textit{5} concepts per image (Figure\ \ref{fig:cpi}).
 Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept (Figure\ \ref{fig:ipc}).
@@ -210,7 +213,7 @@ We also explored various activation functions, starting with \href{https://keras
 
 Both dense layers were configured with 128 neurons, resulting in a 128-dimensional embedding space.
 
-\begin{figure}[h]
+\begin{figure}
    \centering
    \includegraphics[width=1\linewidth]{img/Tikz_Model.png}
    \caption{\textit{Model Layout}}
@@ -235,7 +238,9 @@ We attempted to introduce a pre-training phase preceding the actual model traini
 %To enhance the stability of this intensive parameter training, we attempted to introduce a pre-training phase preceding the actual model training. The primary objective was to establish a more stable training process.
 The approach involved pre-training the two encoders independently and without projections by incorporating a dense layer on top of them and training them in a multi-label classification scenario, making use of the provided concept dataset as labels. Subsequently, we would remove the dense classification layer and integrate the encoders into our CLIP model, followed by initiating the primary training phase.
 
-Unfortunately, pre-training the text encoder did not yield any improvements; it only prolonged the entire training procedure. However, pre-training the image encoder resulted in a slight but consistent enhancement. Consequently, we opted to retain this initial pre-training for all subsequent iterations of the model.
+%Unfortunately, pre-training the text encoder did not yield any improvements; it only prolonged the entire training procedure. However, pre-training the image encoder resulted in a slight but consistent enhancement. Consequently, we opted to retain this initial pre-training for all subsequent iterations of the model.
+While pre-training the text encoder did not yield any improvements, only prolonging the  training procedure; pre-training the image encoder resulted in a slight but consistent enhancement.
+Consequently, we opted to retain this initial pre-training for all subsequent iterations of the model.
 
 \subsection{Data Augmentation}
 To further improve performance we decided to insert data augmentation techniques inside our training and evaluation pipelines.
@@ -243,7 +248,8 @@ All the augmentation modules are given a seed for random number generation in or
 
 \subsubsection{Classic Data Augmentation}
 Classic data augmentation (DAug) consists of adding minor perturbations of various natures on input training data in order to incentivize the model to generalize.
-Due to the modular nature of our training pipeline, to implement the DAug process, it was sufficient to insert a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
+%Due to the modular nature of our training pipeline, to implement the DAug process, it was sufficient to insert a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
+The DAug process was implemented with a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
 
 We experimented with various different DAug pipelines, but the best results were obtained using the referenced pipelines (Figure\ \ref{fig:daugp}).
 %\begin{figure}[h]
@@ -256,8 +262,11 @@ We experimented with various different DAug pipelines, but the best results were
 All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
 
 The text augmentation modules were implemented by us, drawing inspiration from the NLP Albumentations notebook by Alex Shonenkov\cite{nlp_alb}.
-The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
-The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
+%The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
+%The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
+The \texttt{RandomSwapWords} module creates a boolean mask for the caption associated with a certain input sample using a probability parameter $p$.
+The words highlighted by the mask are then randomly shuffled.
+The \texttt{RandomConceptWords} module selects a random number of concepts based on a probability parameter $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
 
 Even though the direct increase in performance caused by DAug was marginal, it opened up other paths for improvement that were previously unfeasible due to the model overfitting, such as using a larger BERT architectures and employing a bigger embedding size.
 
@@ -281,11 +290,15 @@ This modification ensures seamless compatibility of the encoder with our existin
 The integration of this solution had a significant positive impact on the model's performance, resulting in substantial improvement.
 
 \subsection{Evaluation}
-In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric, which is not really optimal for various reasons, therefore we decided to write a separate notebook solely dedicated to model evaluation for the two main retrieval tasks.
-An additional similar notebook was created with the purpose of comparing multiple models' performance on the established evaluation metrics.
+%In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric, which is not really optimal for various reasons, therefore we decided to write a separate notebook solely dedicated to model evaluation for the two main retrieval tasks.
+%An additional similar notebook was created with the purpose of comparing multiple models' performance on the established evaluation metrics.
+In the first steps of this project we were using the \textit{loss} returned by the model as its quality metric.
+We then decided to revision and streamline the retrieval task evaluation process, separating it into two main notebooks: one solely dedicated to model evaluation and another with the purpose of comparing multiple models' performance.
 
-The inference procedure is specular for image and text retrieval: we first generate the embeddings of the feature that we want to retrieve by calling the \texttt{predict} method of the relevant encoder on the dataset that we want to utilize.
-Then, for every query of the dataset we generate the embedding through the other encoder, and we compute the \textit{cosine similarity} to then retrieve the \textit{top-k} results for each query.
+%The inference procedure is specular for image and text retrieval: we first generate the embeddings of the feature that we want to retrieve by calling the \texttt{predict} method of the relevant encoder on the dataset that we want to utilize.
+%Then, for every query of the dataset we generate the embedding through the other encoder, and we compute the \textit{cosine similarity} to then retrieve the \textit{top-k} results for each query.
+The inference procedure is specular for image and text retrieval: we first generate the embeddings of the feature that we want to retrieve by using the relevant encoder.
+Then, for every query of the dataset we generate the embedding utilizing the other encoder, and we compute the \textit{cosine similarity} to then retrieve the \textit{top-k} results for each query.
 
 Finally, we compute the mean \textbf{accuracy}, \textbf{precision}, \textbf{recall} and \textbf{F1 score} for the query dataset through \textit{micro-averaging}, and we visualize them utilizing \textit{graphs} and \textit{reports} with the possibility of comparing evaluations between models or against a random classifier baseline.
 However, we noticed there are multiple \textbf{relevance metrics} that are interesting to take into consideration (for simplicity, only image retrieval is illustrated):
@@ -319,7 +332,7 @@ For visualization reasons, both image and text data is shown in the results of b
 %   \caption{\textit{Text Retrieval}}
 %\end{figure}
 
-\begin{figure}[h]
+\begin{figure}
    \centering
    %\includegraphics[width=1\linewidth]{img/T2I_test1.png}
    \includegraphics[width=0.8\linewidth]{img/T2I_test_compact.png}
@@ -327,7 +340,7 @@ For visualization reasons, both image and text data is shown in the results of b
    \label{fig:iret}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
    \centering
    % \includegraphics[width=1\linewidth]{img/I2T_test1.png}
    \includegraphics[width=1\linewidth]{img/I2T_test_compact.png}
@@ -348,9 +361,11 @@ For visualization reasons, both image and text data is shown in the results of b
 
 Not all tweaks and adjustments to the model resulted in an improvement. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart (Figure\ \ref{fig:imprp}).
 
-This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
+% This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
+This chart displays the \textbf{concept overlap accuracy} at $k=10$ with a concept threshold of $n=2$ for each model modification.
+Blue bars on the chart signify changes that yielded improvements and were integrated, while gray bars indicate changes that failed to enhance the model and were discarded.
 
-\begin{figure}[h]
+\begin{figure}
    \centering
    %\includegraphics[width=1\linewidth]{img/Improvement_Plot.png}
    \includegraphics[width=0.8\linewidth]{img/Improvement_Plot.png}
@@ -384,18 +399,29 @@ Conversely, when comparing images and captions from different samples, the simil
 
 Once our model had successfully achieved a high level of performance, we decided to put it to the test in a \textit{zero-shot classification} scenario, as demonstrated and utilized in the CLIP paper.
 
-The fundamental idea behind this approach involves having a set of textual classes serving as our classification labels. When presented with an image for classification, we encode both the image and the classes. Following this, we calculate the similarity between the embedding of the image and the embeddings of the classes. By applying a \textit{softmax function} in order to sharpen the distribution, we determine the highest similarity score, which becomes our prediction.
+The fundamental idea behind this approach involves having a set of textual classes serving as our classification labels.
+When presented with an image for classification, we encode both the image and the classes.
+Following this, we calculate the similarity between the embedding of the image and the embeddings of the classes.
+By applying a \textit{softmax function} in order to sharpen the distribution, we determine the highest similarity score, which becomes our prediction.
 
 \subsection{Custom Dataset}
-In order to comprehensively assess our model's classification capabilities, we opted to construct a tailored dataset specifically designed for this purpose. Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of\ldots'} or \textit{ `ultrasound image of\ldots}'. Hence, we decided to create a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
+%In order to comprehensively assess our model's classification capabilities, we opted to construct a tailored dataset specifically designed for this purpose.
+%Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of\ldots'} or \textit{ `ultrasound image of\ldots}'.
+%Hence, we decided to create a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
+In order to better assess our model's classification capabilities, we opted to construct a tailored dataset from a subset of our test dataset, to avoid any potential biases.
+Our rationale came from the observation that nearly every entry in the dataset caption explicitly delineated the type of analysis depicted in the corresponding image, such as \textit{`x-ray scan of\ldots'} or \textit{`ultrasound image of\ldots}'.
+Hence, we decided to create a dataset where each sample comprised an image paired with a label representing the specific type of analysis conducted in that image.
 
-To create this dataset, we utilized our test dataset, to avoid any potential biases. We built a piece of code to extract words from a predefined set of labels found within the image captions. These labels were subsequently employed as classes, allowing us to compile a custom dataset. We chose 5 classes comprising 4111 samples with the following distribution: \textbf{angiography}: \textit{299}, \textbf{echocardiography}: \textit{211}, \textbf{ultrasound}: \textit{520}, \textbf{tomography}: \textit{1873}, \textbf{x-ray}: \textit{1208}..
+%To create this dataset, we utilized our test dataset, to avoid any potential biases.
+We built a piece of code to extract words from a predefined set of labels found within the image captions.
+These labels were subsequently employed as classes, allowing us to compile a custom dataset.
+We chose 5 classes comprising 4111 samples with the following distribution: \textbf{angiography}: \textit{299}, \textbf{echocardiography}: \textit{211}, \textbf{ultrasound}: \textit{520}, \textbf{tomography}: \textit{1873}, \textbf{x-ray}: \textit{1208}.
 
 %Upon extracting the images from the test set, we ended up with a dataset comprising 4111 samples, with each sample associated with one of the specified five labels, with the following class distribution of samples: angiography: \textit{299}, echocardiography: \textit{211}, ultrasound: \textit{520}, tomography: \textit{1873}, xray: \textit{1208}.
 
 \subsection{Results}
 
-\begin{figure}[h]
+\begin{figure}
    \centering
    %\includegraphics[width=1\linewidth]{img/Classification_Result.png}
    \includegraphics[width=0.7\linewidth]{img/Classification_Result.png}
@@ -417,12 +443,15 @@ These results led to an overall \textbf{accuracy} of \textbf{94\%}, exceeding ou
 
 This project faced several challenges, mainly due to the model's unconventional architecture. 
 %Initially, we built both encoders from scratch to test the limits of this base design and apply our knowledge about the \textit{transformer} architecture that we learned from the course. However, this approach started showing limitations over time, leading us to shift to pre-trained models.
-To improve the model, we used traditional deep learning techniques such as adding \textit{residual connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods. Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. 
+To improve the model, we used traditional deep learning techniques such as adding \textit{residual connections}, data preprocessing to reduce dimensionality, data augmentation, alongside more unconventional and creative methods.
+Overcoming overfitting was one of our major challenges, which we addressed by reducing model parameters, employing smaller encoders and projections, and using data augmentation. 
 %Moreover, dealing with a large model and a huge dataset required optimizations like \textit{lazy loading} to work effectively with the complete dataset.
 
-Our efforts to adjust the loss function proved unsuccessful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
+%Our efforts to adjust the loss function proved unsuccessful. This demonstrates that the base CLIP loss function implemented by OpenAI performs exceptionally well with this architecture, leaving little room for improvement, even in our specific scenario.
+Our efforts to adjust the loss function proved unsuccessful. This demonstrates that the original OpenAI CLIP loss function leaves little room for improvement, even in our specific scenario.
 
-Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. 
+Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification.
+To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. 
 %Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. 
 Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
 
