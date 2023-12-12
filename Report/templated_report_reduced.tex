@@ -93,26 +93,26 @@ This peculiar pre-training technique enables the model to achieve relevant perfo
 The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext)\cite{roco} which consists of \textit{83275} elements composed of a low resolution image that has been reduced in size, a corresponding textual caption that describes the image, and a set of concept labels that characterizes the attributes of the image.
 
 There are \textit{80813} unique captions as most of them are present in the database only one time, the most common caption appears in \textit{261} images.
-Images can have from \textit{1} to \textit{50} concepts associated to them from a total of \textit{8374} concepts, averaging around \textit{5} concepts per image.
-Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept.
+Images can have from \textit{1} to \textit{50} concepts associated to them from a total of \textit{8374} concepts, averaging around \textit{5} concepts per image (Figure\ \ref{fig:cpi}).
+Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept (Figure\ \ref{fig:ipc}).
 
-\begin{figure}[h]
-   \centering
-   \includegraphics[width=0.8\linewidth]{img/Data_Exploration_2.png}
-   \caption{\textit{Concepts per Image}}
-\end{figure}
-\begin{figure}[h]
-   \centering
-   \includegraphics[width=0.8\linewidth]{img/Data_Exploration_3.png}
-   \caption{\textit{Images per Concept}}
-\end{figure}
+%\begin{figure}[h]
+%   \centering
+%   \includegraphics[width=0.8\linewidth]{img/Data_Exploration_2.png}
+%   \caption{\textit{Concepts per Image}}
+%\end{figure}
+%\begin{figure}[h]
+%   \centering
+%   \includegraphics[width=0.8\linewidth]{img/Data_Exploration_3.png}
+%   \caption{\textit{Images per Concept}}
+%\end{figure}
 
 
 %------------------------------------------------------------------------
 \section{Hackathon Results}
 The self-imposed goal for the hackathon was to build a CLIP model capable of performing image retrieval, thus we initially left out the portion of data regarding concepts and labels.
 
-Unfortunately we didn't manage to create a functioning notebook in the allotted time.
+Unfortunately we did not manage to create a functioning notebook in the allotted time.
 However, we can still consider ourselves satisfied with our work, since right after the event we noticed that we were just a small change away to obtain a fully working CLIP model.
 
 \subsection{Initial Intuition}
@@ -145,11 +145,11 @@ Then, the individual losses are calculated by means of \href{https://www.tensorf
 
 % The day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
 
-As mentioned before, the very last notebook obtained at the end of the hackathon didn't work correctly.
+As mentioned before, the very last notebook obtained at the end of the hackathon did not work correctly.
 However, the day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
 By adapting the structure of our network to the input data, fixing minor conflicts related to typing and employing \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/SparseCategoricalCrossentropy}{sparse categorical cross-entropy} instead of \textit{categorical cross-entropy}, we managed to obtain a working CLIP implementation.
 
-Due to the inefficient loading technique we weren't able to hold the entirety of the dataset and the model in memory, thus we couldn't test it properly.
+Due to the inefficient loading technique we were not able to hold the entirety of the dataset and the model in memory, thus we could not test it properly.
 However, by considering a fraction of the dataset and training the model on it for around 10 epochs, we noticed that the results were quite scarce as the loss would not get any lower after the first few epochs.
 %When considering a top-k image-retrieval task on the training dataset with an exact caption as a query, the target image was only occasionally present in the top-10 matched results, and never in the top-5.
 
@@ -202,9 +202,9 @@ In the end we successfully overcame this obstacle thanks to the \href{https://ww
 %   \item an \textit{image encoder} followed by a 2-layer dense neural network
 %   \item a \textit{text encoder} followed by a 2-layer dense neural network
 %\end{itemize}
-As previously explained, the two encoders in our achitecture are individually followed by a 2-layer dense neural network. The purpose of this network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
+As previously explained, the two encoders in our architecture are individually followed by a 2-layer dense neural network. The purpose of this network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
 In an effort to enhance this projection, we engaged in thorough experimentation.
-After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, ending in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
+After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, ending in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization} (Figure\ \ref{fig:ml}).
 
 We also explored various activation functions, starting with \href{https://keras.io/api/layers/activation_layers/relu/}{ReLU} and subsequently testing \href{https://www.tensorflow.org/api_docs/python/tf/keras/activations/gelu}{GELU}, \href{https://www.tensorflow.org/api_docs/python/tf/nn/silu}{SiLU}, and \href{https://www.tensorflow.org/api_docs/python/tf/nn/selu}{SELU}. Ultimately, SELU demonstrated a significant improvement, prompting us to adopt it for the projection.
 
@@ -214,6 +214,7 @@ Both dense layers were configured with 128 neurons, resulting in a 128-dimension
    \centering
    \includegraphics[width=1\linewidth]{img/Tikz_Model.png}
    \caption{\textit{Model Layout}}
+   \label{fig:ml}
 \end{figure}  
 
 We experimented with various embedding space dimensions, initially reducing it to 64 and then further down to 32 after some tinkering. This 32-dimensonal setting proved to be the best for a while. We also tried 16 dimensions, but this configuration was not on par with the previous. It was only after significant modifications to our model and the use of \textit{Data Augmentation} that we increased it back to 64, as detailed further in the report.
@@ -244,13 +245,13 @@ All the augmentation modules are given a seed for random number generation in or
 Classic data augmentation (DAug) consists of adding minor perturbations of various natures on input training data in order to incentivize the model to generalize.
 Due to the modular nature of our training pipeline, to implement the DAug process, it was sufficient to insert a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
 
-We experimented with various different DAug pipelines, but the following gave us best results:
-\begin{figure}[h]
-   \centering
-   \includegraphics[width=1\linewidth]{img/Tikz_Daug_1.png}
-   \includegraphics[width=0.8\linewidth]{img/Tikz_Daug_2.png}
-   \caption{\textit{DAug Pipelines}}
-\end{figure}
+We experimented with various different DAug pipelines, but the best results were obtained using the referenced pipelines (Figure\ \ref{fig:daugp}).
+%\begin{figure}[h]
+%   \centering
+%   \includegraphics[width=1\linewidth]{img/Tikz_Daug_1.png}
+%   \includegraphics[width=0.8\linewidth]{img/Tikz_Daug_2.png}
+%   \caption{\textit{DAug Pipelines}}
+%\end{figure}
 
 All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
 
@@ -264,7 +265,8 @@ Even though the direct increase in performance caused by DAug was marginal, it o
 Test Time Augmentation (TTA) is slightly different from DAug, as it is performed inside the model, at inference time.
 In order to reduce variance of predictions, the model is given \texttt{tta\_n} different augmented versions of the same input sample (plus the original inputs), the model is asked to perform a prediction for all of them, and then average the results to obtain a final prediction.
 
-For TTA we utilized the same augmentation pipeline as in the previous step, with slightly modified parameters to make it more aggressive and without the \texttt{RandomConceptWords} module.
+For TTA we utilized a slightly different augmentation pipeline as in the previous step.
+% For TTA we utilized the same augmentation pipeline as in the previous step, with slightly modified parameters to make it more aggressive and without the \texttt{RandomConceptWords} module.
 %We then implemented a wrapper for the encoders of the model, that takes as input the actual encoder of the model, an augmentation pipeline, and other TTA parameters (such as \texttt{tta\_n}). The wrapper produces a modified encoder that performs TTA with the desired parameters whenever is called.
 We then implemented a wrapper for the encoders of the model that produces a modified encoder capable of performing TTA with the desired parameters whenever is called.
 
@@ -299,7 +301,7 @@ This method of evaluation steadily gave worse results than other approaches.
 \section{Results}
 
 \subsection{Image and Text Retrieval Samples}
-Some sample outputs from the image and text retrieval tasks using $k=3$.
+Some sample outputs from the image and text retrieval tasks using $k=3$ (Figures\ \ref{fig:iret},\ \ref{fig:tret}).
 
 For visualization reasons, both image and text data is shown in the results of both retrieval tasks; only the target feature is actually retrieved by the model in each task, while the other is obtained through a lookup of the dataset.
 
@@ -322,6 +324,7 @@ For visualization reasons, both image and text data is shown in the results of b
    %\includegraphics[width=1\linewidth]{img/T2I_test1.png}
    \includegraphics[width=0.8\linewidth]{img/T2I_test_compact.png}
    \caption{\textit{Image Retrieval}}
+   \label{fig:iret}
 \end{figure}
 
 \begin{figure}[h]
@@ -329,6 +332,7 @@ For visualization reasons, both image and text data is shown in the results of b
    % \includegraphics[width=1\linewidth]{img/I2T_test1.png}
    \includegraphics[width=1\linewidth]{img/I2T_test_compact.png}
    \caption{\textit{Text Retrieval}}
+   \label{fig:tret}
 \end{figure}
 
 %\begin{figure}[h]
@@ -342,7 +346,7 @@ For visualization reasons, both image and text data is shown in the results of b
 
 %The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
 
-Not all tweaks and adjustments to the model resulted in an improvement. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
+Not all tweaks and adjustments to the model resulted in an improvement. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart (Figure\ \ref{fig:imprp}).
 
 This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
@@ -351,6 +355,7 @@ This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a c
    %\includegraphics[width=1\linewidth]{img/Improvement_Plot.png}
    \includegraphics[width=0.8\linewidth]{img/Improvement_Plot.png}
    \caption{\textit{Model improvement overview}}
+   \label{fig:imprp}
 \end{figure}
 
 \subsection{Embedding Space}
@@ -362,14 +367,14 @@ To illustrate this, we selected a random batch of 32 samples from the test datas
 We then employed their respective encoders to encode both the images and their associated captions and computed similarities among all samples.
 %Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
-\begin{figure}[h]
-   \centering
-   %\includegraphics[width=0.6\linewidth]{img/Diagonal.png}
-   \includegraphics[width=0.4\linewidth]{img/Diagonal.png}
-   \caption{\textit{Diagonal trend in embeddings}}
-\end{figure}
+%\begin{figure}[h]
+%   \centering
+%   %\includegraphics[width=0.6\linewidth]{img/Diagonal.png}
+%   \includegraphics[width=0.4\linewidth]{img/Diagonal.png}
+%   \caption{\textit{Diagonal trend in embeddings}}
+%\end{figure}
 
-As expected, our observations reveal a clear \textit{diagonal trend} within the visualization.
+As expected, our observations reveal a clear \textit{diagonal trend} within the visualization (Figure\ \ref{fig:diag}).
 This trend distinctly illustrates that images and captions originating from the same sample show a notably high degree of similarity, denoted by a brighter color in the visualization.
 Conversely, when comparing images and captions from different samples, the similarity appears significantly lower, depicted by a darker color.
 
@@ -395,11 +400,12 @@ Upon extracting the images from the test set, we ended up with a dataset compris
    %\includegraphics[width=1\linewidth]{img/Classification_Result.png}
    \includegraphics[width=0.7\linewidth]{img/Classification_Result.png}
    \caption{\textit{Classification Confusion Matrix}}
+   \label{fig:clasres}
 \end{figure}
 
 We then wrapped the classification procedure in a function and performed evaluation just as we would normally do with a trained classifier.
 
-As it's possible to observe from the confusion matrix visualization, the model's predictions seem well-balanced as a faint diagonal is present.
+As it's possible to observe from the confusion matrix visualization (Figure\ \ref{fig:clasres}), the model's predictions seem well-balanced as a faint diagonal is present.
 However, there might be some slight bias towards the \textit{angiography class} as it is the one with the most false positive predictions associated overall.
 This is possibly due to the conceptual overlap between the angiography technique and other types of exams such as x-ray and tomography.
 
@@ -419,6 +425,38 @@ Our efforts to adjust the loss function proved unsuccessful. This demonstrates t
 Assessing the model's performance was challenging due to its unique architecture not geared towards common tasks like regression or classification. To address this, we developed metrics like \textit{Caption Equality} and \textit{Concept Overlap} for detailed evaluation. 
 %Visual inspection and plotting of computed similarities consistently showed a diagonal trend, confirming its functionality. 
 Furthermore, the remarkable results in zero-shot classification undeniably demonstrated the model's effectiveness and generalization capabilities.
+
+%-------------------------------------------------------------------------
+\appendix
+\section{Additional Images}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\linewidth]{img/Data_Exploration_2.png}
+   \caption{\textit{Concepts per Image}}
+   \label{fig:cpi}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\linewidth]{img/Data_Exploration_3.png}
+   \caption{\textit{Images per Concept}}
+   \label{fig:ipc}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\linewidth]{img/Tikz_Daug_1.png}
+   \includegraphics[width=0.8\linewidth]{img/Tikz_Daug_2.png}
+   \caption{\textit{DAug Pipelines}}
+   \label{fig:daugp}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.6\linewidth]{img/Diagonal.png}
+   \caption{\textit{Diagonal trend in embeddings}}
+   \label{fig:diag}
+\end{figure}
 
 %-------------------------------------------------------------------------
 
