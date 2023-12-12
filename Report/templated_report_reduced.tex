@@ -197,12 +197,12 @@ Importing the model into our architecture was challenging, given that most metho
 In the end we successfully overcame this obstacle thanks to the \href{https://www.tensorflow.org/hub}{\texttt{tensorflow\_hub}} module, importing BERT as a \href{https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer}{\texttt{KerasLayer}} and incorporating it into our model. This allowed us to employ slimmed down versions of BERT to avoid overfitting, such as BERT 4L (BERT with only 4 transformer layers) and BERT 2L (2 transformer layers).
 
 \subsection{Embedding Projection}
-As previously explained, our architecture comprises the following components:
-\begin{itemize}
-   \item an \textit{image encoder} followed by a 2-layer dense neural network
-   \item a \textit{text encoder} followed by a 2-layer dense neural network
-\end{itemize}
-The purpose of the 2-layer dense network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
+%As previously explained, our architecture comprises the following components:
+%\begin{itemize}
+%   \item an \textit{image encoder} followed by a 2-layer dense neural network
+%   \item a \textit{text encoder} followed by a 2-layer dense neural network
+%\end{itemize}
+As previously explained, the two encoders in our achitecture are individually followed by a 2-layer dense neural network. The purpose of this network is to project the \textit{high-level features} extracted from the encoders into a shared embedding space.
 In an effort to enhance this projection, we engaged in thorough experimentation.
 After extensive tinkering, we settled on a 2-layer dense network with \textit{dropout} incorporated in the middle, along with a \textit{residual connection} linking the two dense layers, ending in \href{https://keras.io/api/layers/normalization_layers/layer_normalization/}{layer normalization}.
 
@@ -303,19 +303,34 @@ Some sample outputs from the image and text retrieval tasks using $k=3$.
 
 For visualization reasons, both image and text data is shown in the results of both retrieval tasks; only the target feature is actually retrieved by the model in each task, while the other is obtained through a lookup of the dataset.
 
+%\begin{figure}[h]
+%   \centering
+%   %\includegraphics[width=1\linewidth]{img/T2I_test1.png}
+%   \includegraphics[width=0.8\linewidth]{img/T2I_test1.png}
+%   \caption{\textit{Image Retrieval}}
+%\end{figure}
+%
+%\begin{figure}[h]
+%   \centering
+%   % \includegraphics[width=1\linewidth]{img/I2T_test1.png}
+%   \includegraphics[width=0.8\linewidth]{img/I2T_test1.png}
+%   \caption{\textit{Text Retrieval}}
+%\end{figure}
+
 \begin{figure}[h]
    \centering
    %\includegraphics[width=1\linewidth]{img/T2I_test1.png}
-   \includegraphics[width=0.8\linewidth]{img/T2I_test1.png}
+   \includegraphics[width=0.8\linewidth]{img/T2I_test_compact.png}
    \caption{\textit{Image Retrieval}}
 \end{figure}
 
 \begin{figure}[h]
    \centering
    % \includegraphics[width=1\linewidth]{img/I2T_test1.png}
-   \includegraphics[width=0.8\linewidth]{img/I2T_test1.png}
+   \includegraphics[width=1\linewidth]{img/I2T_test_compact.png}
    \caption{\textit{Text Retrieval}}
 \end{figure}
+
 %\begin{figure}[h]
 %   \centering
 %   % \includegraphics[width=1\linewidth]{img/I2T_test2.png}
@@ -325,9 +340,11 @@ For visualization reasons, both image and text data is shown in the results of b
 
 \subsection{Model Architecture Improvement}
 
-The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
+%The final iteration of the model emerged after implementing various tweaks and adjustments to its architecture and training methods mentioned in the previous section. However, not all of them resulted in an improved model. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
 
-This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements in the architecture and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
+Not all tweaks and adjustments to the model resulted in an improvement. Some changes led to worse outcomes, while others showed no discernible impact. Each adjustment was meticulously evaluated using the methodologies mentioned before (\textit{caption equality} and \textit{concept overlap}). Given the numerous changes to the model and the many more evaluation results for each, we have summarized the overall enhancement of the model through a corresponding chart.
+
+This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
 \begin{figure}[h]
    \centering
@@ -339,11 +356,11 @@ This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a c
 \subsection{Embedding Space}
 
 %To effectively demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize its inner workings, specifically how the \textit{visual encoder} and the \textit{text encoder} interact.  
-To demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize how the \textit{visual encoder} and the \textit{text encoder} interact. The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors (one for images and one for captions) that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
+To demonstrate the model's capabilities and the coherence of its \textit{embedding space}, our aim now is to visualize how the \textit{visual encoder} and the \textit{text encoder} interact. %The primary goal of the model is centered on training both encoders to encode images and their corresponding descriptions within a unified embedding space. This process generates two latent vectors (one for images and one for captions) that ideally exhibit high similarity to each other while remaining distinct from other sample pairs within the set.
 
-To illustrate this concept, we selected a random batch of 32 samples from the test dataset.
-We then employed their respective encoders to encode both the images and their associated captions.
-Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
+To illustrate this, we selected a random batch of 32 samples from the test dataset.
+We then employed their respective encoders to encode both the images and their associated captions and computed similarites among all samples.
+%Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
 \begin{figure}[h]
    \centering
