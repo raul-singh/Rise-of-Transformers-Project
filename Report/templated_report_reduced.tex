@@ -73,7 +73,7 @@ The initial assignment was carried out as a one-day hackathon held at Politecnic
 
 \subsection{Task}
 The central challenge for this project is to develop a functional implementation of the \href{https://openai.com/}{OpenAI} \textbf{CLIP} model for the main task of \textbf{image retrieval} in a biomedical application.
-The following blog post \cite{clip_blog} and research paper \cite{clip_paper} were given in the assignment as a starting point for understanding the principles of the model, in addition to the information already given by Professor Giacomo Boracchi during the course's frontal lectures.
+The following blog post\cite{clip_blog} and research paper\cite{clip_paper} were given in the assignment as a starting point for understanding the principles of the model, in addition to the information already given by Professor Giacomo Boracchi during the course's frontal lectures.
 
 \subsubsection*{CLIP Principles}
 In short, \textbf{CLIP} stands for \textbf{C}ontrastive \textbf{L}anguage-\textbf{I}mage \textbf{P}re-training, and it is composed by two \textit{encoders} (one dedicated to images and one for text) which are trained to minimize the loss computed as the \textit{cosine similarity} of the embedded image pairs.
@@ -82,26 +82,26 @@ This peculiar pre-training technique enables the model to achieve relevant perfo
 
 \subsection{Dataset Analysis}
 
-The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) \cite{roco} which consists of \textit{83275} elements composed of:
+%The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext) \cite{roco} which consists of \textit{83275} elements composed of:
 
-\begin{itemize}
-   \item A low resolution image that has been reduced in size.
-   \item A corresponding textual caption that describes the image.
-   \item A set of concept labels that characterizes the attributes of the image.
-\end{itemize}
+%\begin{itemize}
+%   \item A low resolution image that has been reduced in size.
+%   \item A corresponding textual caption that describes the image.
+%   \item A set of concept labels that characterizes the attributes of the image.
+%\end{itemize}
+
+The dataset provided is a \textit{simplified} version of the \textbf{ROCO} dataset (\textbf{R}adiology \textbf{O}bjects in \textbf{CO}ntext)\cite{roco} which consists of \textit{83275} elements composed of a low resolution image that has been reduced in size, a corresponding textual caption that describes the image, and a set of concept labels that characterizes the attributes of the image.
 
 There are \textit{80813} unique captions as most of them are present in the database only one time, the most common caption appears in \textit{261} images.
-
 Images can have from \textit{1} to \textit{50} concepts associated to them from a total of \textit{8374} concepts, averaging around \textit{5} concepts per image.
-
 Concepts can have from \textit{2} to \textit{25989} images associated to them from a total of \textit{83275} concepts, averaging around \textit{47} images per concept.
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    \includegraphics[width=0.8\linewidth]{img/Data_Exploration_2.png}
    \caption{\textit{Concepts per Image}}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    \includegraphics[width=0.8\linewidth]{img/Data_Exploration_3.png}
    \caption{\textit{Images per Concept}}
@@ -125,7 +125,7 @@ Since the given dataset was problematic to handle due to its dimension and its u
 The preliminary data gathering pipeline loads captions and images separately, performing different preprocessing for both of them (using the \textit{transformer custom standardization function} seen during lectures for textual data, while performing \textit{resizing} and \textit{normalization} for image pixel data).
 The captions are then vectorized using a \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/TextVectorization}{Keras text vectorization layer}, all the elements are split manually into train, test and validation sets and stored into Python lists.
 
-Various visualizations of the imported images and data were added to ensure the correctness of the loading process.
+%Various visualizations of the imported images and data were added to ensure the correctness of the loading process.
 
 \subsubsection{Model Creation}
 For the preliminary model we decided to implement the encoders from scratch in order to avoid adding useless complexity to our prototype.
@@ -141,17 +141,20 @@ The complete model routes the two inputs (image and text) to their respective en
 Then, the individual losses are calculated by means of \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/CategoricalCrossentropy}{categorical cross-entropy} and are averaged to obtain the final loss.
 
 \subsection{Idea Refining}
-As mentioned before, the very last notebook obtained at the end of the hackathon didn't work correctly as there were some small discrepancies between the sizes of the expected inputs vs.\ the actual inputs, and we were trying to apply \textit{categorical cross-entropy} utilizing numeric variables that were not \textit{one-hot encoded}.
+%As mentioned before, the very last notebook obtained at the end of the hackathon didn't work correctly as there were some small discrepancies between the sizes of the expected inputs vs.\ the actual inputs, and we were trying to apply \textit{categorical cross-entropy} utilizing numeric variables that were not \textit{one-hot encoded}.
 
-The day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
+% The day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
+
+As mentioned before, the very last notebook obtained at the end of the hackathon didn't work correctly.
+However, the day after the hackathon took place we dedicated some of our time to slightly refine the final product obtained in order to have a functioning model.
 By adapting the structure of our network to the input data, fixing minor conflicts related to typing and employing \href{https://www.tensorflow.org/api_docs/python/tf/keras/losses/SparseCategoricalCrossentropy}{sparse categorical cross-entropy} instead of \textit{categorical cross-entropy}, we managed to obtain a working CLIP implementation.
 
 Due to the inefficient loading technique we weren't able to hold the entirety of the dataset and the model in memory, thus we couldn't test it properly.
 However, by considering a fraction of the dataset and training the model on it for around 10 epochs, we noticed that the results were quite scarce as the loss would not get any lower after the first few epochs.
-When considering a top-k image-retrieval task on the training dataset with an exact caption as a query, the target image was only occasionally present in the top-10 matched results, and never in the top-5.
+%When considering a top-k image-retrieval task on the training dataset with an exact caption as a query, the target image was only occasionally present in the top-10 matched results, and never in the top-5.
 
-The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
-This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
+%The reported results of this step are based on empirical observation as we did not have a proper evaluation system for this task yet.
+%This is due to the fact that our main goal for the hackathon was to produce a functioning model, not evaluate its performance.
 
 
 %------------------------------------------------------------------------
@@ -172,7 +175,7 @@ It was previously mentioned that the size of the complete dataset was a critical
 By implementing a \textit{lazy loading} interface utilizing the \href{https://www.tensorflow.org/api_docs/python/tf/data/Dataset}{TensorFlow dataset class} and exploiting the \textit{map/reduce paradigm} with \textit{lambda functions} we were able to load the actual pixel data of images from their image path only when needed.
 We wrapped this operation inside a custom function called \texttt{create\char`_dataset} that exposes a general interface which allows for parametrization of the dataset creation procedure through parameters that influence \textit{batching}, \textit{shuffling}, \textit{dataset structure}, \textit{caching} and other aspects.
 
-At this point we noticed that the vectorization for the captions was causing a minor \textit{data leakage} from the test set to the train set, we corrected the mistake and implemented a new splitting function by wrapping the \href{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html}{scikit-learn train\_test\_split function} inside a custom function to also manage validation splits.
+% At this point we noticed that the vectorization for the captions was causing a minor \textit{data leakage} from the test set to the train set, we corrected the mistake and implemented a new splitting function by wrapping the \href{https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html}{scikit-learn train\_test\_split function} inside a custom function to also manage validation splits.
 
 \subsection{Pre-Trained Models}
 As previously explained, our implementation of the model was completely from scratch. At this point we encountered a performance bottleneck, impeding any further enhancement of the model. This was probably due to the huge amount of parameters in the model, which were quite a challenging task to train from scratch, even considering our large dataset.
@@ -207,13 +210,13 @@ We also explored various activation functions, starting with \href{https://keras
 
 Both dense layers were configured with 128 neurons, resulting in a 128-dimensional embedding space.
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    \includegraphics[width=1\linewidth]{img/Tikz_Model.png}
    \caption{\textit{Model Layout}}
 \end{figure}  
 
-We experimented with various embedding space dimensions, initially reducing it to 64 and then further down to 32 after some tinkering. This 32-dimensonal setting proved to be the best for a while. We also tried 16 dimensions but this configuration was not on par with the previous. It was only after significant modifications to our model and the use of \textit{Data Augmentation} that we increased it back to 64, as detailed further in the report.
+We experimented with various embedding space dimensions, initially reducing it to 64 and then further down to 32 after some tinkering. This 32-dimensonal setting proved to be the best for a while. We also tried 16 dimensions, but this configuration was not on par with the previous. It was only after significant modifications to our model and the use of \textit{Data Augmentation} that we increased it back to 64, as detailed further in the report.
 
 \subsection{Loss Function Tweaks}
 We made several attempts to refine the loss function while implementing various changes to the model in hopes of enhancing its performance.
@@ -224,8 +227,6 @@ Initially, we aimed to penalize the loss associated with similarities among dist
 \subsubsection{Weighted Loss}
 Our subsequent attempt involved employing a weighted average strategy. In the original CLIP paper, the authors independently computed the loss for the image encoder and the text encoder, then averaging these values. We attempted to improve this approach by weighting this average as follows: $\alpha \cdot L_{img} + (1 - \alpha) \cdot L_{txt}$ (where $L_{img}$ is the loss associated to the image encoder, $L_{txt}$ to the text encoder). We experimented with both using $\alpha$ as a hyperparameter and as a trainable parameter (confined between 0 and 1). However, both attempts yielded no improvement. Interestingly, in the case of the trainable parameter, the resulting $\alpha$ value converged remarkably close to $0.5$ after training. This indicated that employing a weighted average was futile, and a regular average remained the optimal choice.
 
-
-\subsubsection{Geometric Mean}
 Given that weighting the mean did not yield improvements, we experimented with various types of means for computing the final loss value, primarily focusing on the \textit{geometric mean}, represented in our case as: $\sqrt[2]{L_{img} \cdot L_{txt}}$. However, this attempt also proved unsuccessful, prompting us to retain the original formulation of the loss.
 
 \subsection{Encoder Pre-training}
@@ -244,20 +245,16 @@ Classic data augmentation (DAug) consists of adding minor perturbations of vario
 Due to the modular nature of our training pipeline, to implement the DAug process, it was sufficient to insert a map call in the dataset creation function, utilizing a dedicated parameter containing the DAug pipeline.
 
 We experimented with various different DAug pipelines, but the following gave us best results:
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    \includegraphics[width=1\linewidth]{img/Tikz_Daug_1.png}
-   \caption{\textit{Image Pipeline}}
-\end{figure}
-\begin{figure}[H]
-   \centering
    \includegraphics[width=0.8\linewidth]{img/Tikz_Daug_2.png}
-   \caption{\textit{Text Pipeline}}
+   \caption{\textit{DAug Pipelines}}
 \end{figure}
 
 All the image augmentation modules are provided by the \href{https://www.tensorflow.org/api_docs/python/tf/keras/layers/}{Keras Layers} library and their parameters generally correspond to symmetric transformation ranges (except for the Random Brightness layer, where the first parameter is the factor range and the second parameter is the value range).
 
-The text augmentation modules were implemented by us, drawing inspiration from the NLP Albumentations notebook by Alex Shonenkov \cite{nlp_alb}.
+The text augmentation modules were implemented by us, drawing inspiration from the NLP Albumentations notebook by Alex Shonenkov\cite{nlp_alb}.
 The \texttt{RandomSwapWords} module takes a probability $p$ as parameter, and with that probability creates a boolean mask for the caption associated with a certain input sample. The words highlighted by the mask are then randomly shuffled.
 The \texttt{RandomConceptWords} module takes a list of concept classes and a probability $p$ as parameters, selects a random number of concepts based on $p$ and the concepts of the input sample, randomly selects a position inside the caption for each selected concept, and inserts the concept reference texts inside the caption at the chosen positions.
 
@@ -268,7 +265,8 @@ Test Time Augmentation (TTA) is slightly different from DAug, as it is performed
 In order to reduce variance of predictions, the model is given \texttt{tta\_n} different augmented versions of the same input sample (plus the original inputs), the model is asked to perform a prediction for all of them, and then average the results to obtain a final prediction.
 
 For TTA we utilized the same augmentation pipeline as in the previous step, with slightly modified parameters to make it more aggressive and without the \texttt{RandomConceptWords} module.
-We then implemented a wrapper for the encoders of the model, that takes as input the actual encoder of the model, an augmentation pipeline, and other TTA parameters (such as \texttt{tta\_n}). The wrapper produces a modified encoder that performs TTA with the desired parameters whenever is called.
+%We then implemented a wrapper for the encoders of the model, that takes as input the actual encoder of the model, an augmentation pipeline, and other TTA parameters (such as \texttt{tta\_n}). The wrapper produces a modified encoder that performs TTA with the desired parameters whenever is called.
+We then implemented a wrapper for the encoders of the model that produces a modified encoder capable of performing TTA with the desired parameters whenever is called.
 
 Unfortunately there were no direct improvements by using TTA, at best it resulting in a performance equivalent to the base model.
 With TTA being a self-ensembling method, our guess is that the model is too stable on its predictions to gain any meaningful benefit from this technique.
@@ -297,7 +295,6 @@ However, we noticed there are multiple \textbf{relevance metrics} that are inter
 Some other evaluation approaches were tried for the image retrieval scenario, such as the \textit{Concept-Fusion Captions} approach, which consists of evaluating the model on samples where each caption was generated by concatenating the concepts of the corresponding sample.
 This method of evaluation steadily gave worse results than other approaches.
 
-
 %------------------------------------------------------------------------
 \section{Results}
 
@@ -306,24 +303,25 @@ Some sample outputs from the image and text retrieval tasks using $k=3$.
 
 For visualization reasons, both image and text data is shown in the results of both retrieval tasks; only the target feature is actually retrieved by the model in each task, while the other is obtained through a lookup of the dataset.
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    %\includegraphics[width=1\linewidth]{img/T2I_test1.png}
    \includegraphics[width=0.8\linewidth]{img/T2I_test1.png}
    \caption{\textit{Image Retrieval}}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
-   %\includegraphics[width=1\linewidth]{img/I2T_test1.png}
-   \caption{\textit{Text Retrieval 1}}
+   % \includegraphics[width=1\linewidth]{img/I2T_test1.png}
+   \includegraphics[width=0.8\linewidth]{img/I2T_test1.png}
+   \caption{\textit{Text Retrieval}}
 \end{figure}
-\begin{figure}[H]
-   \centering
-   % \includegraphics[width=1\linewidth]{img/I2T_test2.png}
-   \includegraphics[width=0.8\linewidth]{img/I2T_test2.png}
-   \caption{\textit{Text Retrieval 2}}
-\end{figure}
+%\begin{figure}[h]
+%   \centering
+%   % \includegraphics[width=1\linewidth]{img/I2T_test2.png}
+%   \includegraphics[width=0.8\linewidth]{img/I2T_test2.png}
+%   \caption{\textit{Text Retrieval 2}}
+%\end{figure}
 
 \subsection{Model Architecture Improvement}
 
@@ -331,7 +329,7 @@ The final iteration of the model emerged after implementing various tweaks and a
 
 This chart displays the \textbf{concept overlap accuracy} at $k=10$ and with a concept threshold of $n=2$ for each model modification, as it serves as a concise and clear metric to show the progression. Blue bars on the chart signify changes that yielded improvements in the architecture and were consequently integrated, while gray bars indicate changes that failed to enhance the model and were thus discarded.
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    %\includegraphics[width=1\linewidth]{img/Improvement_Plot.png}
    \includegraphics[width=0.8\linewidth]{img/Improvement_Plot.png}
@@ -347,7 +345,7 @@ To illustrate this concept, we selected a random batch of 32 samples from the te
 We then employed their respective encoders to encode both the images and their associated captions.
 Subsequently, we normalized these embeddings and computed similarities by performing matrix multiplication between them. This process allows us to quantify the relationships and similarities between the encoded representations of images and captions within this shared embedding space on data that the model has never seen.
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    %\includegraphics[width=0.6\linewidth]{img/Diagonal.png}
    \includegraphics[width=0.4\linewidth]{img/Diagonal.png}
@@ -375,7 +373,7 @@ Upon extracting the images from the test set, we ended up with a dataset compris
 
 \subsection{Results}
 
-\begin{figure}[H]
+\begin{figure}[h]
    \centering
    %\includegraphics[width=1\linewidth]{img/Classification_Result.png}
    \includegraphics[width=0.7\linewidth]{img/Classification_Result.png}
